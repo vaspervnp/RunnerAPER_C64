@@ -44,4 +44,14 @@ yo              = $33
 skill           = $34           ; 0 easy, 1 medium, 2 hard
 restart         = $35           ; tests / menu: start a new game
 
+; input (input.asm), player (player.asm)
+keys_held       = $36
+keys_pressed    = $37
+test_mode       = $38           ; tests: keys come from test_keys
+test_keys       = $39
+shown_y         = $3a           ; YSCROLL of the picture shown this frame
+irq_clip_on     = $3b           ; the clip lines of this frame (latched by the top IRQ)
+irq_clip_off    = $3c
+irq_ptrs        = $3d           ; 3 bytes: the sprites' frames this frame
+
 ZP_END          = $90

@@ -1,9 +1,18 @@
 {
  "frames": [
   {
-   "filename": "shadow",
+   "filename": "sh_ground",
    "frame": {
     "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 21
+   }
+  },
+  {
+   "filename": "sh_roof",
+   "frame": {
+    "x": 24,
     "y": 0,
     "w": 24,
     "h": 21

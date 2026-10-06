@@ -1,7 +1,7 @@
 {
  "frames": [
   {
-   "filename": "run0",
+   "filename": "s1_run0",
    "frame": {
     "x": 0,
     "y": 0,
@@ -10,7 +10,7 @@
    }
   },
   {
-   "filename": "run1",
+   "filename": "s1_run1",
    "frame": {
     "x": 12,
     "y": 0,
@@ -19,7 +19,7 @@
    }
   },
   {
-   "filename": "run2",
+   "filename": "s1_run2",
    "frame": {
     "x": 24,
     "y": 0,
@@ -28,9 +28,144 @@
    }
   },
   {
-   "filename": "run3",
+   "filename": "s1_run3",
    "frame": {
     "x": 36,
+    "y": 0,
+    "w": 12,
+    "h": 21
+   }
+  },
+  {
+   "filename": "s1_lean_l",
+   "frame": {
+    "x": 48,
+    "y": 0,
+    "w": 12,
+    "h": 21
+   }
+  },
+  {
+   "filename": "s1_lean_r",
+   "frame": {
+    "x": 60,
+    "y": 0,
+    "w": 12,
+    "h": 21
+   }
+  },
+  {
+   "filename": "s2_jump_up",
+   "frame": {
+    "x": 72,
+    "y": 0,
+    "w": 12,
+    "h": 21
+   }
+  },
+  {
+   "filename": "s2_jump_down",
+   "frame": {
+    "x": 84,
+    "y": 0,
+    "w": 12,
+    "h": 21
+   }
+  },
+  {
+   "filename": "s3_run0",
+   "frame": {
+    "x": 96,
+    "y": 0,
+    "w": 12,
+    "h": 21
+   }
+  },
+  {
+   "filename": "s3_run1",
+   "frame": {
+    "x": 108,
+    "y": 0,
+    "w": 12,
+    "h": 21
+   }
+  },
+  {
+   "filename": "s3_run2",
+   "frame": {
+    "x": 120,
+    "y": 0,
+    "w": 12,
+    "h": 21
+   }
+  },
+  {
+   "filename": "s3_run3",
+   "frame": {
+    "x": 132,
+    "y": 0,
+    "w": 12,
+    "h": 21
+   }
+  },
+  {
+   "filename": "s3_lean_l",
+   "frame": {
+    "x": 144,
+    "y": 0,
+    "w": 12,
+    "h": 21
+   }
+  },
+  {
+   "filename": "s3_lean_r",
+   "frame": {
+    "x": 156,
+    "y": 0,
+    "w": 12,
+    "h": 21
+   }
+  },
+  {
+   "filename": "s3_jump_up",
+   "frame": {
+    "x": 168,
+    "y": 0,
+    "w": 12,
+    "h": 21
+   }
+  },
+  {
+   "filename": "s3_jump_down",
+   "frame": {
+    "x": 180,
+    "y": 0,
+    "w": 12,
+    "h": 21
+   }
+  },
+  {
+   "filename": "s4_jump_up",
+   "frame": {
+    "x": 192,
+    "y": 0,
+    "w": 12,
+    "h": 21
+   }
+  },
+  {
+   "filename": "s4_jump_down",
+   "frame": {
+    "x": 204,
+    "y": 0,
+    "w": 12,
+    "h": 21
+   }
+  },
+  {
+   "filename": "s5_jump",
+   "frame": {
+    "x": 216,
     "y": 0,
     "w": 12,
     "h": 21

@@ -115,11 +115,21 @@ CHAR_ORDER = ["font", "coins", "track", "side_l", "side_r", "bridges", "hud"]
 # shared sprite colours ($d025/$d026); each sprite adds its own ($d027+n)
 SPRITE_MC0 = colour("blue")
 SPRITE_MC1 = colour("light_red")
-RUNNER_FRAMES = ["run0", "run1", "run2", "run3"]
+# the runner in 5 sizes (z 0..4, as the CPC's s1..s5): s1 on the ground, s3 on a
+# roof, s2..s5 in the air
+RUNNER_FRAMES = ([f"s1_{f}" for f in ("run0", "run1", "run2", "run3", "lean_l", "lean_r")]
+                 + ["s2_jump_up", "s2_jump_down"]
+                 + [f"s3_{f}" for f in ("run0", "run1", "run2", "run3", "lean_l", "lean_r",
+                                         "jump_up", "jump_down")]
+                 + ["s4_jump_up", "s4_jump_down", "s5_jump"])
+SHADOWS = ["sh_ground", "sh_roof"]
 SPRITE_SHEETS = {
     # multicolor body (sprite 0) + hires outline (sprite 1) per frame
     "runner": dict(frames=RUNNER_FRAMES, mc=True),
     "runner_outline": dict(frames=RUNNER_FRAMES, mc=False),
     "powerups": dict(frames=POWERUPS, mc=True),
-    "shadow": dict(frames=["shadow"], mc=False),
+    "shadow": dict(frames=SHADOWS, mc=False),
 }
+
+# the empty sprite block after the converted ones: a runner under a bridge
+# deck is cut by pointing its sprites here for those lines (src/player.asm)

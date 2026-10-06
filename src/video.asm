@@ -45,8 +45,23 @@ video_init
         sta VIC_BG1
         lda #GREY
         sta VIC_BG2
-        lda #0
+        lda #0                  ; sprites: 0 body (multicolor), 1 outline, 2 shadow
         sta VIC_SPR_ENA
+        sta VIC_SPR_XMSB
+        sta VIC_SPR_YEXP
+        sta VIC_SPR_XEXP
+        sta VIC_SPR_PRIO
+        lda #%001
+        sta VIC_SPR_MC
+        lda #SPRITE_MC0
+        sta VIC_SPR_MC0
+        lda #SPRITE_MC1
+        sta VIC_SPR_MC1
+        lda #SPR_RUNNER_S1_RUN0_COL
+        sta VIC_SPR_COL
+        lda #BLACK
+        sta VIC_SPR_COL+1
+        sta VIC_SPR_COL+2
 
         lda CIA2_DDRA           ; VIC bank 1: $4000-$7fff
         ora #3
@@ -152,6 +167,7 @@ video_irq_top
         lda scroll_cmd
         and #7
         sta scroll_cmd          ; consumed: no second swap if the main loop is late
+        sta shown_y
         tax
         ora #D011_ON
         sta VIC_CTRL1

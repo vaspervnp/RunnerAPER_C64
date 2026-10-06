@@ -602,23 +602,84 @@ def sprite_from_cpc(px, mc_map):
 
 
 # runner, seen from behind: r shirt (own colour), b jeans (MC0), s skin (MC1);
-# h hair and k shoes are black and go to the hires outline sprite only
-RUNNER_ART = {
-    "run0": [
-        "............", "....hhhh....", "...hhhhhh...", "...hhhhhh...", "...shhhhs...", "....ssss....",
-        "..rrrrrrrr..", ".rrrrrrrrrr.", ".rrrrrrrrrr.", ".srrrrrrrrr.", ".s.rrrrrr.r.", "...rrrrrr.s.",
-        "...bbbbbb...", "...bbbbbb...", "...bbb.bbb..", "...bb...bb..", "...bb...bb..", "...bb...kk..",
-        "...bb.......", "...bb.......", "...kk.......",
-    ],
-    "run1": [
-        "............", "....hhhh....", "...hhhhhh...", "...hhhhhh...", "...shhhhs...", "....ssss....",
-        "..rrrrrrrr..", ".rrrrrrrrrr.", ".rrrrrrrrrr.", ".rrrrrrrrrr.", ".srrrrrrrrs.", ".srrrrrrrrs.",
-        "...bbbbbb...", "...bbbbbb...", "...bb..bb...", "...bb..bb...", "...bb..bb...", "...bb..bb...",
-        "...bb..bb...", "...kk..kk...", "............",
-    ],
+# h hair and k shoes are black and go to the hires outline sprite only.
+# Drawn from parts, so the five sizes and all the poses look alike.
+RUNNER_SIZES = {          # head w, head h, torso w, torso h, legs (multicolor pixels / rows)
+    1: (4, 3, 6, 4, 5),
+    2: (4, 3, 6, 5, 4),
+    3: (4, 4, 8, 5, 6),
+    4: (6, 4, 8, 6, 5),
+    5: (6, 4, 10, 6, 6),
 }
-RUNNER_ART["run2"] = [row[::-1] for row in RUNNER_ART["run0"]]
-RUNNER_ART["run3"] = RUNNER_ART["run1"]
+
+
+def runner_art(size, pose):
+    hw, hh, tw, th, lh = RUNNER_SIZES[size]
+    grid = [["."] * 12 for _ in range(21)]
+
+    def put(x, y, ch):
+        if 0 <= x < 12 and 0 <= y < 21:
+            grid[y][x] = ch
+
+    lean = {"lean_l": -1, "lean_r": 1}.get(pose, 0)
+    leg_w = max(2, tw // 2 - 1)
+    gap = tw - 2 * leg_w
+    legs = {"run0": (lh, lh - 2), "run1": (lh - 1, lh - 1), "run2": (lh - 2, lh), "run3": (lh - 1, lh - 1),
+            "lean_l": (lh - 1, lh - 1), "lean_r": (lh - 1, lh - 1),
+            "jump_up": (lh - 2, lh - 2), "jump_down": (lh - 1, lh - 1), "jump": (lh - 1, lh - 1)}[pose]
+    total = hh + 1 + th + max(legs) + 1
+    top = 21 - total
+    x0 = (12 - tw) // 2                       # torso left
+    hx = (12 - hw) // 2 + lean                # head left
+    y = top
+    for r in range(hh):                       # hair, ears on the last row
+        inset = 1 if r == 0 else 0
+        for x in range(hx + inset, hx + hw - inset):
+            put(x, y + r, "h")
+        if r == hh - 1:
+            put(hx, y + r, "s")
+            put(hx + hw - 1, y + r, "s")
+    y += hh
+    for x in range(5 + lean, 7 + lean):       # neck
+        put(x, y, "s")
+    y += 1
+    shoulders = y
+    for r in range(th):                       # shirt
+        shift = lean if r < th // 2 else 0
+        for x in range(x0 + shift, x0 + tw + shift):
+            put(x, y + r, "r")
+    # arms
+    if pose in ("jump_up", "jump"):
+        for r in range(1, hh + 1):
+            put(x0 - 1, shoulders - r, "s")
+            put(x0 + tw, shoulders - r, "s")
+    elif pose == "jump_down":
+        put(x0 - 1, shoulders, "s")
+        put(x0 - 2, shoulders, "s")
+        put(x0 + tw, shoulders, "s")
+        put(x0 + tw + 1, shoulders, "s")
+    else:
+        left, right = {"run0": (2, th), "run2": (th, 2), "lean_l": (th, 1), "lean_r": (1, th)}.get(pose, (th - 1, th - 1))
+        for r in range(left):
+            put(x0 - 1 + (lean if r < th // 2 else 0), shoulders + r, "s")
+        for r in range(right):
+            put(x0 + tw + (lean if r < th // 2 else 0), shoulders + r, "s")
+    y += th
+    spread = 1 if pose in ("jump_down", "jump") else 0
+    for side, length in enumerate(legs):      # jeans and shoes
+        lx = x0 - spread if side == 0 else x0 + leg_w + gap + spread
+        for r in range(length):
+            for x in range(lx, lx + leg_w):
+                put(x, y + r, "b")
+        for x in range(lx, lx + leg_w):
+            put(x, y + length, "k")
+    if gap and not spread:                    # the crotch
+        for x in range(x0 + leg_w, x0 + leg_w + gap):
+            put(x, y, "b")
+    return ["".join(row) for row in grid]
+
+
+RUNNER_ART = {name: runner_art(int(name[1]), name[3:]) for name in A.RUNNER_FRAMES}
 
 
 def runner_frame(rows):
@@ -664,10 +725,15 @@ def powerup_sheet():
 
 
 def shadow_sheet():
-    img = blank(24, 21, TRANSPARENT)
-    for y, (x0, x1) in enumerate([(7, 16), (5, 18), (4, 19), (5, 18), (7, 16)]):
-        hline(img, x0, x1, 16 + y, colour("black"))
-    return [("shadow", img)]
+    """Hires ellipses, centred, on the bottom rows (the feet line)."""
+    out = []
+    for name, rows in (("sh_ground", [(8, 15), (6, 17), (8, 15)]),
+                       ("sh_roof", [(7, 16), (5, 18), (4, 19), (5, 18), (7, 16)])):
+        img = blank(24, 21, TRANSPARENT)
+        for k, (x0, x1) in enumerate(rows):
+            hline(img, x0, x1, 21 - len(rows) + k, colour("black"))
+        out.append((name, img))
+    return out
 
 
 SHEET_MAKERS = {

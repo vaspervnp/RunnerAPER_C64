@@ -7,6 +7,7 @@
 
 WORLD_RING      = $0400                 ; 64 row descriptors x 16 bytes
 WSTATE          = $c000                 ; generator state (world.asm)
+PSTATE          = $c100                 ; the runner (player.asm)
 
 ; text: our font's codes (assets64.FONT_GLYPHS: space, a-z, 0-9, ...)
         .enc "game"
@@ -58,6 +59,8 @@ game_start
         sta restart
         jsr world_init
         jsr video_init
+        jsr player_init
+        jsr player_sprites
 
         lda #<irq_top
         sta IRQ_VEC
@@ -92,7 +95,11 @@ main_loop
 +       lda #0
         sta frame_flag
 
+        jsr read_input
+        jsr player_update
+        jsr collide
         jsr video_frame
+        jsr player_sprites
 
         jsr measure_load
 frame_done                      ; tests put a checkpoint here
@@ -140,18 +147,78 @@ irq_top
         lda #1
         sta VIC_IRQ
         jsr video_irq_top
+        jsr sprites_irq
 irq_top_done                    ; tests: the picture of this frame is set
+        lda clip_on             ; this frame's deck cuts
+        sta irq_clip_on
+        lda clip_off
+        sta irq_clip_off
+        ldx #2
+-       lda spr_ptr,x
+        sta irq_ptrs,x
+        dex
+        bpl -
         inc frame_counter
         bne +
         inc frame_counter+1
 +       inc frame_flag
-        lda #<irq_split
-        sta IRQ_VEC
-        lda #>irq_split
-        sta IRQ_VEC+1
-        lda #SPLIT_IRQ_LINE
+        lda irq_clip_on
+        beq +
+        sec
+        sbc #2
+        ldx #<irq_clip_on_h
+        ldy #>irq_clip_on_h
+        jmp irq_next
++       lda irq_clip_off
+        beq irq_to_split
+        sec
+        sbc #2
+        ldx #<irq_clip_off_h
+        ldy #>irq_clip_off_h
+        jmp irq_next
+
+; A = line, X/Y = handler: the next raster IRQ
+irq_next
+        stx IRQ_VEC
+        sty IRQ_VEC+1
         sta VIC_RASTER
         jmp $ea81               ; KERNAL: restore Y/X/A, rti
+irq_to_split
+        lda #SPLIT_IRQ_LINE
+        ldx #<irq_split
+        ldy #>irq_split
+        jmp irq_next
+
+; a bridge deck starts cutting the runner on line irq_clip_on
+irq_clip_on_h
+        lda #1
+        sta VIC_IRQ
+        lda #BLANK_BLOCK
+        sta clip_ptrs
+        sta clip_ptrs+1
+        sta clip_ptrs+2
+        lda irq_clip_on
+        jsr clip_write
+        lda irq_clip_off
+        beq irq_to_split
+        sec
+        sbc #2
+        ldx #<irq_clip_off_h
+        ldy #>irq_clip_off_h
+        jmp irq_next
+
+; ... and ends on line irq_clip_off - 1
+irq_clip_off_h
+        lda #1
+        sta VIC_IRQ
+        ldx #2
+-       lda irq_ptrs,x
+        sta clip_ptrs,x
+        dex
+        bpl -
+        lda irq_clip_off
+        jsr clip_write
+        jmp irq_to_split
 
 irq_split
         lda #1
@@ -168,6 +235,8 @@ irq_split_end
 
         .include "video.asm"
         .include "world.asm"
+        .include "input.asm"
+        .include "player.asm"
 code_end
 
         .cerror code_end > $4000, "code runs into the VIC bank"
@@ -178,6 +247,8 @@ code_end
         * = $5000
 sprites
         .binary "data/sprites.bin"
+sprite_blank                    ; an empty block (player.asm: cut under decks)
+        .fill 64, 0
 
 ; --- data ---------------------------------------------------------------------
         * = $8000

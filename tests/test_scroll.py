@@ -56,10 +56,17 @@ class Scroll:
         return top * 8 + y, y, screen, top
 
     def picture(self):
-        """The finished picture of the previous frame, one list per raster line."""
+        """The finished picture of the previous frame, one list per raster
+        line; the runner's column (its sprites stay put) blanked out."""
         dw, dh, xo, yo, iw, ih, px = self.vm.display()
-        return {line: px[(line + BUF_Y) * dw + xo:(line + BUF_Y) * dw + xo + 320]
-                for line in range(PF_FIRST, HUD.stop)}
+        x = self.vm.peek8(0xD000) - 24                  # the runner's sprites: x .. x + 23
+        out = {}
+        for line in range(PF_FIRST, HUD.stop):
+            row = bytearray(px[(line + BUF_Y) * dw + xo:(line + BUF_Y) * dw + xo + 320])
+            if line < BAND.start:
+                row[x:x + 24] = bytes(24)
+            out[line] = bytes(row)
+        return out
 
 
 class ScrollTest(unittest.TestCase):
@@ -117,8 +124,8 @@ class ScrollTest(unittest.TestCase):
                 self.assertEqual(cur[line], prev[line - d], f"line ${line:02X} did not move by {d}")
             for line in BAND:
                 self.assertEqual(set(cur[line]), {0}, f"band line ${line:02X} not black")
-            self.assertNotEqual(set(cur[PF_LAST]), {0})        # the playfield reaches the band
-            self.assertNotEqual(set(cur[PF_FIRST]), {0})
+            self.assertNotEqual(set(cur[PF_LAST]) - {0}, set())    # the playfield reaches the band
+            self.assertNotEqual(set(cur[PF_FIRST]) - {0}, set())
             self.assertEqual(cur[HUD.start], hud)
             for line in HUD:
                 self.assertEqual(cur[line], prev[line], f"HUD line ${line:02X} moved")
@@ -167,7 +174,7 @@ class CyclesTest(unittest.TestCase):
         self.assertLess(max(results["build stage 0"]), 9000)
         self.assertLess(max(results["build stage 1"]), 7000)
         self.assertLess(max(results["split IRQ"]), 900)
-        self.assertLess(max(results["top IRQ"]), 200)
+        self.assertLess(max(results["top IRQ"]), 400)    # scroll + sprites
 
 
 if __name__ == "__main__":

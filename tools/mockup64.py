@@ -64,9 +64,9 @@ SCENES = {
 
 # sprites: (sheet, frame, x, y) in hires pixels inside the playfield
 SPRITES = {
-    "city": [("shadow", "shadow", 148, 128), ("runner", "run0", 148, 128), ("runner_outline", "run0", 148, 128),
+    "city": [("shadow", "sh_ground", 148, 128), ("runner", "s1_run0", 148, 128), ("runner_outline", "s1_run0", 148, 128),
              ("powerups", "magnet", 76, 116)],
-    "station": [("shadow", "shadow", 148, 120), ("runner", "run1", 148, 120), ("runner_outline", "run1", 148, 120),
+    "station": [("shadow", "sh_roof", 148, 112), ("runner", "s4_jump_up", 148, 112), ("runner_outline", "s4_jump_up", 148, 112),
                 ("powerups", "helmet", 212, 128)],
 }
 
