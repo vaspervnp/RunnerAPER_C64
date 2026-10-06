@@ -6,7 +6,8 @@ is decided there):
     (no half-copied row ever shows): the characters of that row;
   - the position disp_top*8 + YSCROLL advances by exactly the speed;
   - in pixels, each picture is the previous one moved down by the speed,
-    the band $d7-$de is black and the HUD never moves;
+    the band $d7-$de is black and the HUD never moves (its fixed
+    cells: the score and the route change);
   - no frame overruns and the hidden buffer is always ready in time.
 """
 
@@ -67,6 +68,10 @@ class Scroll:
             row = bytearray(px[(line + BUF_Y) * dw + xo:(line + BUF_Y) * dw + xo + 320])
             if line < BAND.start:
                 row[x:x + 24] = bytes(24)
+            elif line >= HUD.start + 8 and line < HUD.start + 16:
+                row[:] = bytes(320)                    # the route (runner moves on it)
+            elif line >= HUD.start:
+                row[:128] = bytes(128)                 # score and best change
             out[line] = bytes(row)
         return out
 

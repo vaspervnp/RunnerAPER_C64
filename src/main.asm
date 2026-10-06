@@ -18,6 +18,7 @@ KSTATE          = $c200                 ; coins, power-ups, score (pickups.asm)
         .enc "none"
 
 IRQ_LINE = 0                    ; top of the frame, above the picture
+CLIP_LEAD = 3                   ; a clip IRQ comes this many lines before its line
 
 ; ---------------------------------------------------------------------------
 ; BASIC stub: 10 SYS <start>
@@ -49,6 +50,8 @@ start
         cpx #ZP_END
         bne -
 
+        lda #$02                ; best score until the table (phase 8): 20000
+        sta best+2
         jsr game_start
         jmp main_loop
 
@@ -61,6 +64,7 @@ game_start
         jsr world_init
         jsr pickups_init
         jsr video_init
+        jsr hud_init
         jsr player_init
         lda #LIVES_START
         sta lives
@@ -115,6 +119,7 @@ main_loop
         jsr video_frame
         jsr player_sprites
         jsr pickup_sprites
+        jsr hud_update
 
         jsr measure_load
 frame_done                      ; tests put a checkpoint here
@@ -180,14 +185,14 @@ irq_top_done                    ; tests: the picture of this frame is set
         lda irq_clip_on
         beq +
         sec
-        sbc #2
+        sbc #CLIP_LEAD
         ldx #<irq_clip_on_h
         ldy #>irq_clip_on_h
         jmp irq_next
 +       lda irq_clip_off
         beq irq_to_split
         sec
-        sbc #2
+        sbc #CLIP_LEAD
         ldx #<irq_clip_off_h
         ldy #>irq_clip_off_h
         jmp irq_next
@@ -217,7 +222,7 @@ irq_clip_on_h
         lda irq_clip_off
         beq irq_to_split
         sec
-        sbc #2
+        sbc #CLIP_LEAD
         ldx #<irq_clip_off_h
         ldy #>irq_clip_off_h
         jmp irq_next
@@ -253,6 +258,7 @@ irq_split_end
         .include "input.asm"
         .include "player.asm"
         .include "pickups.asm"
+        .include "hud.asm"
 code_end
 
         .cerror code_end > $4000, "code runs into the VIC bank"

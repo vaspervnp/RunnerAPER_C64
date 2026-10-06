@@ -109,12 +109,6 @@ video_init
         sta SCREEN_B+$2e8,x
         inx
         bne -
-        ldx #39
--       lda hud_text,x
-        sta SCREEN_A + HUD_ROW*40,x
-        sta SCREEN_B + HUD_ROW*40,x
-        dex
-        bpl -
 
         ; screen A shows world rows 20 (top) .. 0 (row 20), made in order
         lda #PF_ROWS-1
@@ -339,8 +333,3 @@ new_row
 
 screen_a_lo     .byte <(SCREEN_A + range(PF_ROWS) * 40)
 screen_a_hi     .byte >(SCREEN_A + range(PF_ROWS) * 40)
-
-hud_text
-        .enc "game"
-        .text "  000000  hi 020000          coins 0000  "
-        .enc "none"

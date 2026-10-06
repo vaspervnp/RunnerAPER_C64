@@ -65,5 +65,7 @@ mg_row          = $4a           ; magnet
 pk_lane         = $4b
 eff_lo          = $4c           ; scroll speed with the power-ups
 eff_hi          = $4d
+best            = $4e           ; best score (BCD, 3 bytes), kept between games
+hud_i           = $51
 
 ZP_END          = $90

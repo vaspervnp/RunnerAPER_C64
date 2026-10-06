@@ -301,11 +301,13 @@ class PickupTest(unittest.TestCase):
         t.plant(b, 0, flags=F_STATION)
         t.go()
         t.until(lambda: vm.peek8("station_next") == 2)
+        self.assertEqual(vm.peek8("route_x"), 7, "the HUD's route: on the first station")
         self.label_check(t, "station_1", vm.peek16("disp_top") - LABEL_ROW)
         vm.poke("station_next", 6)
         vm.poke("language", 1)
         extra = t.score() - t.distance()
         t.until(lambda: vm.peek8("station_next") == 1)
+        self.assertEqual(vm.peek8("route_x"), 1, "after Piraeus: the route from the start")
         self.label_check(t, "station_6", vm.peek16("disp_top") - LABEL_ROW)
         self.assertEqual(t.score() - t.distance() - extra, 1000)
 

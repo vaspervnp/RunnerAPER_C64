@@ -42,6 +42,8 @@ pickups_init
         bpl -
         lda #1
         sta station_next
+        lda #ROUTE_FIRST
+        sta route_x
         rts
 
 ; -----------------------------------------------------------------------------
@@ -182,6 +184,7 @@ _add    inc eff_hi
 ; score_row: the world moved one row (video.asm, coarse step)
 ; -----------------------------------------------------------------------------
 score_row
+        jsr route_row                   ; the runner on the HUD's route
         inc distance
         bne +
         inc distance+1
@@ -482,6 +485,9 @@ stations
         bcc +
         ldx #1
 +       stx station_next
+        pha
+        jsr route_to_station
+        pla
         cmp #ROUTE_STATIONS-1
         bne +
         pha
@@ -654,5 +660,15 @@ vis_row         .word ?                 ; its world row
 station_seen    .word ?
 station_next    .byte ?
 no_pickups      .byte ?                 ; test switch: no items, no labels
+route_x         .byte ?                 ; HUD column of the runner on the route
+route_sub       .byte ?                 ; rows into that column
+hud_shown                               ; what the HUD shows ($ff: nothing yet)
+shown_score     .fill 3
+shown_hi        .fill 3
+shown_coins     .fill 2
+shown_lives     .byte ?
+shown_route     .byte ?
+shown_pu        .fill 6
+HUD_SHOWN_SIZE  = * - hud_shown
 KSTATE_SIZE     = * - kstate
         .endv

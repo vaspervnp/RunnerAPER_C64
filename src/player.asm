@@ -370,6 +370,7 @@ _busy   inc anim_tick                   ; the crash goes on tumbling
         sec
         rts
 _game_over
+        jsr update_best
         lda #STATE_GAME_OVER
         sta game_state
         lda #GAME_OVER_FRAMES
@@ -656,7 +657,8 @@ jump_frames_down
 ; -----------------------------------------------------------------------------
 ; IRQ side: sprite registers (top IRQ), and the deck cuts (clip IRQs: the
 ; pointer of a line is fetched at the end of the line before, so the write
-; happens on line L-1 for line L; the IRQ comes on L-2 and waits).
+; happens on line L-1 for line L; the IRQ comes on L-3 and waits: the DMA of
+; seven sprites leaves the KERNAL's IRQ entry too little time on L-2).
 ; -----------------------------------------------------------------------------
 sprites_irq                             ; (unrolled: ~250 cycles)
         lda spr_ena
@@ -691,7 +693,7 @@ sprites_irq                             ; (unrolled: ~250 cycles)
         .endfor
         rts
 
-; A = line L: wait for L-1, then the three pointers (empty or the frames).
+; A = line L: wait for L-1 (or later), then the three pointers (empty or the frames).
 ; The sprites 3-7 fetch at the start of L-1 and hold the CPU: the screen
 ; shown gets them first, three stores right after the wait, before the
 ; fetch of sprite 0 at the end of the line.
@@ -702,8 +704,10 @@ clip_write
         bne _b
         ldx clip_ptrs
         ldy clip_ptrs+1
--       cmp VIC_RASTER
+-       cmp VIC_RASTER                  ; (>= L-1: late, never a frame's wait)
+        bcc +
         bne -
++
         stx SCREEN_A + $3f8
         sty SCREEN_A + $3f9
         lda clip_ptrs+2
@@ -714,8 +718,10 @@ clip_write
         rts
 _b      ldx clip_ptrs
         ldy clip_ptrs+1
--       cmp VIC_RASTER
+-       cmp VIC_RASTER                  ; (>= L-1: late, never a frame's wait)
+        bcc +
         bne -
++
         stx SCREEN_B + $3f8
         sty SCREEN_B + $3f9
         lda clip_ptrs+2
