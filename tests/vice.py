@@ -17,6 +17,7 @@ import time
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 BUILD = os.path.join(ROOT, "build")
 D64 = os.path.join(BUILD, "runner.d64")
+PRG = os.path.join(BUILD, "runner.prg")
 LABELS = os.path.join(BUILD, "labels.txt")
 X64 = os.environ.get("X64", "x64sc")
 
@@ -68,12 +69,12 @@ class Vice:
     """A running x64sc with the game autostarted, stopped in the monitor
     between calls (every command stops the emulation; `cont` resumes it)."""
 
-    def __init__(self, image=D64, extra_args=(), boot_timeout=30.0):
+    def __init__(self, image=PRG, extra_args=(), boot_timeout=30.0):
         self.labels = load_labels()
         self.port = free_port()
         args = [X64, "-console", "-default", "-warp", "-silent", "-sounddev", "dummy",
                 "-binarymonitor", "-binarymonitoraddress", f"ip4://127.0.0.1:{self.port}",
-                *extra_args, "-autostart", image]
+                "-autostartprgmode", "1", *extra_args, "-autostart", image]
         self.proc = subprocess.Popen(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         self.sock = None
         self._req = 0

@@ -25,7 +25,7 @@ SCENES = {
     "city": [
         ("tree_1", [R, "signal_0", R], "ground_b"),
         ("tree_0", [RB, "signal_1", RB], "ground_a"),
-        "footbridge_2", "footbridge_1", "footbridge_0",
+        "footbridge_2", "footbridge_1", "footbridge_0", "footbridge_shadow",
         ("ground_a", ["wagon1_end_top", "stop_0", RB], "tree_2"),
         ("bush", ["wagon1_body_a", "stop_1", "wagon2_end_top"], "tree_1"),
         ("trans_fu_0", ["wagon1_body_b", R, "wagon2_body_a"], "tree_0"),
@@ -44,7 +44,7 @@ SCENES = {
     ],
     "station": [
         ("road_a", [R, R, R], "road_a"),
-        "roadbridge_4", "roadbridge_3", "roadbridge_2", "roadbridge_1", "roadbridge_0",
+        "roadbridge_5", "roadbridge_4", "roadbridge_3", "roadbridge_2", "roadbridge_1", "roadbridge_0",
         ("road_b", [RB, R + "+coin", RB], "road_b"),
         ("plat_end", [R, RB + "+coin", R], "plat_end"),
         ("plat_plain", [RB, R + "+coin", "loco2_nose_top"], "plat_plain"),
@@ -116,7 +116,7 @@ def playfield_rows(scene, sheets):
     cols = A.COLUMN_COLOURS
     coin_rail = P.coin_code(sheets, "coin_rail")
     coin_roof = P.coin_code(sheets, "coin_roof")
-    for spec in SCENES[scene]:
+    for spec in SCENES[scene][:20]:
         if isinstance(spec, str):
             codes = sheets["bridges"][spec]["chars"][0]
         else:

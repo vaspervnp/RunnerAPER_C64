@@ -25,4 +25,23 @@ stalls          = $19           ; coarse steps that had to wait for the hidden b
 split_w1        = $1a           ; $d011 value that starts the black band ($50 | YSCROLL)
 split_delay     = $1b           ; delay before it (shorter when $d6 is a bad line)
 
+
+; world (world.asm)
+rng             = $20           ; word
+dp              = $22           ; word: descriptor being made / drawn
+chunk_ptr       = $24           ; word: the chunk's next row
+ptr3            = $26           ; word
+divisor         = $28
+t8              = $29
+t8b             = $2a
+t8c             = $2b
+t16             = $2c           ; word
+t16b            = $2e           ; word
+obs_t           = $30
+coff            = $31
+ck              = $32
+yo              = $33
+skill           = $34           ; 0 easy, 1 medium, 2 hard
+restart         = $35           ; tests / menu: start a new game
+
 ZP_END          = $90

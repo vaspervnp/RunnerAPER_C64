@@ -3,6 +3,17 @@
 
         .include "hw.inc"
         .include "zp.inc"
+        .include "data/gfx.inc"
+
+WORLD_RING      = $0400                 ; 64 row descriptors x 16 bytes
+WSTATE          = $c000                 ; generator state (world.asm)
+
+; text: our font's codes (assets64.FONT_GLYPHS: space, a-z, 0-9, ...)
+        .enc "game"
+        .cdef "  ", FONT_SPACE
+        .cdef "az", FONT_A
+        .cdef "09", FONT_N0
+        .enc "none"
 
 IRQ_LINE = 0                    ; top of the frame, above the picture
 
@@ -29,12 +40,23 @@ start
         lda CIA1_ICR
         lda CIA2_ICR
 
-        ldx #ZP_END-ZP_START-1  ; clear the game's zero page
+        ldx #ZP_START           ; clear the game's zero page
         lda #0
--       sta ZP_START,x
-        dex
-        bpl -
+-       sta 0,x
+        inx
+        cpx #ZP_END
+        bne -
 
+        jsr game_start
+        jmp main_loop
+
+; a new game at the current skill: world, screens, IRQs
+game_start
+        sei
+        lda #0
+        sta VIC_IRQ_MASK
+        sta restart
+        jsr world_init
         jsr video_init
 
         lda #<irq_top
@@ -49,12 +71,19 @@ start
         lda #1
         sta VIC_IRQ_MASK
         sta VIC_IRQ             ; drop anything pending
+        lda #0
+        sta frame_flag
         cli
+        rts
 
 ; ---------------------------------------------------------------------------
 ; Main loop: one pass per frame, released by the IRQ.
 ; ---------------------------------------------------------------------------
 main_loop
+        lda restart             ; tests / menu: a new game
+        beq +
+        jsr game_start
++
 -       lda frame_flag
         beq -
         cmp #2
@@ -138,3 +167,21 @@ irq_split_end
         jmp $ea81
 
         .include "video.asm"
+        .include "world.asm"
+code_end
+
+        .cerror code_end > $4000, "code runs into the VIC bank"
+
+; --- VIC bank 1: charset and sprites, loaded in place --------------------------
+        * = CHARSET
+        .binary "data/charset.bin"
+        * = $5000
+sprites
+        .binary "data/sprites.bin"
+
+; --- data ---------------------------------------------------------------------
+        * = $8000
+        .include "data/chunks.asm"
+        .include "data/gfx.asm"
+data_end
+        .cerror data_end > WSTATE, "data runs into the generator state"

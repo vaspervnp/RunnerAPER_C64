@@ -416,8 +416,19 @@ def side_right(kind):
 
 # --- bridges (160 px = 40 columns) ------------------------------------------
 def bridge(name):
+    """Rows bottom to top. Railings and parapets MC1/MC2, decks MC2: the
+    same colours in every column, and the deck (%10) hides the runner."""
     img = blank(160, 8)
     kind, i = name.rsplit("_", 1)
+    if i == "shadow":                        # the beam on its piers, shade on the track
+        for y in range(8):
+            hline(img, 0, 159, y, BG)
+        hline(img, 0, 159, 0, MC2)
+        hline(img, 0, 159, 1, MC2)
+        for x in range(0, 160, 40):
+            for y in range(2, 8):
+                hline(img, x + 34, x + 37, y, MC2)
+        return img
     i = int(i)
     if kind == "footbridge":
         if i in (0, 2):                      # railings
@@ -426,30 +437,28 @@ def bridge(name):
             hline(img, 0, 159, 3 if i == 0 else 4, MC1)
             for x in range(0, 160, 6):
                 vline(img, x, 0, 7, MC1)
-            if i == 0:
-                hline(img, 0, 159, 7, BG)    # shadow edge
         else:                                # deck
             for y in range(8):
                 hline(img, 0, 159, y, MC2)
             for x in range(2, 160, 8):
-                img[2][x] = img[6][x + 3 if x + 3 < 160 else x] = BG
-    else:
-        if i in (0, 4):                      # parapets
-            for y in range(8):
-                hline(img, 0, 159, y, MC1)
-            hline(img, 0, 159, 2 if i == 0 else 5, MC2)
-            hline(img, 0, 159, 7 if i == 0 else 0, MC2)
-        else:                                # road deck
-            for y in range(8):
-                hline(img, 0, 159, y, MC2)
-            if i == 2:
-                for x in range(0, 160, 12):
-                    hline(img, x, x + 5, 3, MC1)
-                    hline(img, x, x + 5, 4, MC1)
-            if i == 1:
-                hline(img, 0, 159, 7, BG)
-            if i == 3:
-                hline(img, 0, 159, 0, BG)
+                img[2][x] = BG
+                img[6][min(159, x + 3)] = BG
+        return img
+    if i in (0, 5):                          # parapets
+        for y in range(8):
+            hline(img, 0, 159, y, MC1)
+        hline(img, 0, 159, 2 if i == 0 else 5, MC2)
+        hline(img, 0, 159, 7 if i == 0 else 0, MC2)
+        return img
+    for y in range(8):                       # road deck, two lanes each way
+        hline(img, 0, 159, y, MC2)
+    if i in (1, 4):                          # kerb lines
+        hline(img, 0, 159, 7 if i == 1 else 0, BG)
+    if i == 2:
+        for x in range(0, 160, 12):
+            hline(img, x, x + 5, 7, MC1)
+    if i == 3:
+        hline(img, 0, 159, 0, MC1)           # the middle line
     return img
 
 

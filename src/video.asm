@@ -22,7 +22,8 @@ PF_ROWS         = 21            ; scrolling rows 0-20
 HUD_ROW         = 21            ; HUD rows 21-23
 HUD_ROWS        = 3
 COPY_STAGES     = 2
-COPY_ROWS       = 10            ; rows per stage (2 x 10 = rows 0-19)
+COPY_ROWS0      = 8             ; stage 0: rows 0-7 and the new row's descriptor
+COPY_ROWS1      = 12            ; stage 1: rows 8-19 and the new row's characters
 
 D011_ON         = $10           ; DEN, 24 rows, text
 D011_ECM        = $40           ; ECM + MCM: invalid mode, black
@@ -32,6 +33,7 @@ BAND_TOP        = $d7           ; first black line
 HUD_TOP         = $df           ; first HUD line (bad line of row 21)
 SPLIT_DELAY     = 11            ; delay loop counts (5 cycles each), see video_irq_split
 SPLIT_DELAY_BAD = 3
+HUD_BG          = BLUE
 
 ; ---------------------------------------------------------------------------
 video_init
@@ -41,7 +43,7 @@ video_init
         sta VIC_BG0
         lda #LIGHT_GREY
         sta VIC_BG1
-        lda #BROWN
+        lda #GREY
         sta VIC_BG2
         lda #0
         sta VIC_SPR_ENA
@@ -54,8 +56,6 @@ video_init
         ora #2
         sta CIA2_PRA
 
-        jsr copy_rom_font
-
         lda #D011_ON | 7
         sta VIC_CTRL1
         lda #$18                ; multicolor, 40 columns
@@ -63,13 +63,13 @@ video_init
         lda #D018_A
         sta VIC_MEM
 
-        ; colour RAM: playfield columns fixed, HUD per cell (hires white)
+        ; colour RAM: playfield columns fixed, HUD per cell (white)
         ldx #0
--       lda col_colours,x
+-       lda column_colours,x
         .for rr = 0, rr < PF_ROWS, rr += 1
         sta COLOR_RAM + rr*40,x
         .endfor
-        lda #WHITE
+        lda #8 | WHITE
         .for rr = HUD_ROW, rr < 25, rr += 1
         sta COLOR_RAM + rr*40,x
         .endfor
@@ -79,7 +79,7 @@ video_init
 
         ; both screens: blank, HUD text
         ldx #0
-        lda #$20
+        lda #FONT_SPACE
 -       sta SCREEN_A,x
         sta SCREEN_A+$100,x
         sta SCREEN_A+$200,x
@@ -97,32 +97,28 @@ video_init
         dex
         bpl -
 
-        ; screen A shows world rows 20 (top) .. 0 (row 20)
+        ; screen A shows world rows 20 (top) .. 0 (row 20), made in order
         lda #PF_ROWS-1
         sta disp_top
         lda #0
         sta disp_top+1
         sta cur_buf
-        lda #<SCREEN_A
-        sta ptr
-        lda #>SCREEN_A
-        sta ptr+1
-        ldx #0
--       txa
-        eor #$ff
+        sta gen_row
+        sta gen_row+1
+-       jsr generate_row
+        lda #PF_ROWS-1
         sec
-        adc disp_top            ; world row = top - screen row
-        stx tmp
-        jsr render_row
-        ldx tmp
-        lda ptr
-        clc
-        adc #40
+        sbc gen_row
+        tax
+        lda screen_a_lo,x
         sta ptr
-        bcc +
-        inc ptr+1
-+       inx
-        cpx #PF_ROWS
+        lda screen_a_hi,x
+        sta ptr+1
+        lda gen_row
+        jsr render_row
+        inc gen_row
+        lda gen_row
+        cmp #PF_ROWS
         bne -
 
         lda #0                  ; build screen B for the first coarse step
@@ -134,21 +130,6 @@ video_init
         sta speed_lo
         lda #2
         sta speed_hi
-        rts
-
-; Upper-case ROM font -> CHARSET (the Phase 1 stand-in for our own charset).
-copy_rom_font
-        lda #$33                ; character ROM at $d000
-        sta $01
-        ldx #0
--       .for pg = 0, pg < 8, pg += 1
-        lda $d000 + pg*$100,x
-        sta CHARSET + pg*$100,x
-        .endfor
-        inx
-        bne -
-        lda #$36
-        sta $01
         rts
 
 ; ---------------------------------------------------------------------------
@@ -166,7 +147,9 @@ video_irq_top
         inc disp_top
         bne +
         inc disp_top+1
-+       lda scroll_cmd
++       lda #DARK_GREY          ; the playfield's background (the HUD has its own)
+        sta VIC_BG0
+        lda scroll_cmd
         and #7
         sta scroll_cmd          ; consumed: no second swap if the main loop is late
         tax
@@ -223,6 +206,8 @@ _band   ldx #D011_ON | 7
         bne -
 split_w4
         stx VIC_CTRL1           ; W4: valid mode, row 21 (HUD) starts at $df
+        lda #HUD_BG
+        sta VIC_BG0             ; still in the border
         rts
 
 d018_values
@@ -284,10 +269,10 @@ _fine   sta scroll_y
 copy_jumps
         .word copy_ab0, copy_ba0, copy_ab1, copy_ba1
 
-; copy rows first..first+COPY_ROWS-1 of src to rows +1 of dst
-copy_rows .macro src, dst, first
+; copy rows first..first+count-1 of src to rows +1 of dst
+copy_rows .macro src, dst, first, count
         ldx #39
--       .for row = \first, row < \first + COPY_ROWS, row += 1
+-       .for row = \first, row < \first + \count, row += 1
         lda \src + row*40,x
         sta \dst + (row+1)*40,x
         .endfor
@@ -295,49 +280,42 @@ copy_rows .macro src, dst, first
         bpl -
         .endm
 
-copy_ab0 #copy_rows SCREEN_A, SCREEN_B, 0
-        rts
-copy_ba0 #copy_rows SCREEN_B, SCREEN_A, 0
-        rts
-copy_ab1 #copy_rows SCREEN_A, SCREEN_B, COPY_ROWS
+copy_ab0 #copy_rows SCREEN_A, SCREEN_B, 0, COPY_ROWS0
+        jmp gen_new_row
+copy_ba0 #copy_rows SCREEN_B, SCREEN_A, 0, COPY_ROWS0
+        jmp gen_new_row
+copy_ab1 #copy_rows SCREEN_A, SCREEN_B, COPY_ROWS0, COPY_ROWS1
         lda #<SCREEN_B
         ldx #>SCREEN_B
         jmp new_row
-copy_ba1 #copy_rows SCREEN_B, SCREEN_A, COPY_ROWS
+copy_ba1 #copy_rows SCREEN_B, SCREEN_A, COPY_ROWS0, COPY_ROWS1
         lda #<SCREEN_A
         ldx #>SCREEN_A
-; row 0 of the hidden screen (A/X) = world row disp_top + 1
-new_row
-        sta ptr
-        stx ptr+1
+        jmp new_row
+; stage 0: the next world row (disp_top + 1) is made ...
+gen_new_row
         lda disp_top
         clc
         adc #1
-        jmp render_row
-
-; ---------------------------------------------------------------------------
-; World row A (low byte) -> 40 characters at (ptr). Phase 1 test pattern:
-; character (row + column) & 63, so every row is different and checkable.
-render_row
-        sta tmp+1
-        ldy #0
--       tya
-        clc
-        adc tmp+1
-        and #$3f
-        sta (ptr),y
-        iny
-        cpy #40
-        bne -
+        sta gen_row
+        lda disp_top+1
+        adc #0
+        sta gen_row+1
+        jsr generate_row
+gen_done                        ; tests: a row made
         rts
 
-; colour RAM of the playfield columns (bit 3 = multicolor)
-col_colours
-        .fill 9, 8 | GREEN      ; left side
-        .fill 21, 8 | YELLOW    ; three tracks
-        .fill 10, 8 | GREEN     ; right side
+; ... stage 1: and drawn as row 0 of the hidden screen (A/X)
+new_row
+        sta ptr
+        stx ptr+1
+        lda gen_row
+        jmp render_row
+
+screen_a_lo     .byte <(SCREEN_A + range(PF_ROWS) * 40)
+screen_a_hi     .byte >(SCREEN_A + range(PF_ROWS) * 40)
 
 hud_text
-        .enc "screen"
-        .text "  score 000000  hi 000000  coins 00     "
+        .enc "game"
+        .text "  000000  hi 020000          coins 0000  "
         .enc "none"

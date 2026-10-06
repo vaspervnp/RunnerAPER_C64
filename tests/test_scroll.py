@@ -3,7 +3,7 @@
 Checked at the end of the top IRQ of every frame (the picture of that frame
 is decided there):
   - the shown screen holds world row (disp_top - r) in screen row r, whole
-    (no half-copied row ever shows);
+    (no half-copied row ever shows): the characters of that row;
   - the position disp_top*8 + YSCROLL advances by exactly the speed;
   - in pixels, each picture is the previous one moved down by the speed,
     the band $d7-$de is black and the HUD never moves;
@@ -13,6 +13,7 @@ is decided there):
 import unittest
 
 from vice import Vice
+from world_view import model_rows, row_chars
 
 SCREEN_A, SCREEN_B = 0x4000, 0x4400
 PF_ROWS = 21
@@ -23,7 +24,8 @@ HUD = range(0xDF, 0xF7)
 
 
 def expected_row(world_row):
-    return bytes(((world_row + c) & 0x3F) for c in range(40))
+    """The characters of a world row (the world is made on easy at boot)."""
+    return bytes(row_chars(model_rows(400)[world_row]))
 
 
 class Scroll:
@@ -150,7 +152,7 @@ class CyclesTest(unittest.TestCase):
 
     def test_cycle_budget(self):
         results = {}
-        for _ in range(12):                              # both stages, both buffers
+        for _ in range(40):                              # both stages, both buffers
             c, stage = self.cycles("copy_go", "copy_done", "copy_stage")
             results.setdefault(f"build stage {stage}", []).append(c)
         for _ in range(4):
@@ -159,9 +161,11 @@ class CyclesTest(unittest.TestCase):
         print()
         for k, v in sorted(results.items()):
             print(f"  {k}: {min(v)}-{max(v)} cycles")
-        # stages: the split IRQ (~750) may fall inside one of them
-        self.assertLess(min(results["build stage 0"]), 4500)
-        self.assertLess(min(results["build stage 1"]), 5500)    # + the new row
+        # wall time: the split IRQ (~750) may fall inside a stage.
+        # stage 0: 8 rows + the new row's descriptor (world.asm, ~1600-5000)
+        # stage 1: 12 rows + its 40 characters
+        self.assertLess(max(results["build stage 0"]), 9000)
+        self.assertLess(max(results["build stage 1"]), 7000)
         self.assertLess(max(results["split IRQ"]), 900)
         self.assertLess(max(results["top IRQ"]), 200)
 

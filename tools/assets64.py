@@ -68,7 +68,10 @@ SIDE_KINDS = ["road_a", "road_b", "road_cross_0", "road_cross_1", "kiosk_0", "ki
               "car_0", "car_1", "ground_a", "ground_b", "path", "fence", "tree_0", "tree_1", "tree_2",
               "bush", "trans_uf_0", "trans_uf_1", "trans_fu_0", "trans_fu_1",
               "plat_end", "plat_plain", "plat_bench", "plat_roof", "plat_sign"]
-BRIDGE_ROWS = [f"footbridge_{i}" for i in range(3)] + [f"roadbridge_{i}" for i in range(5)]
+# bottom to top, as many rows as on the CPC (the generator's timing depends on it)
+FOOTBRIDGE_ROWS = ["footbridge_shadow"] + [f"footbridge_{i}" for i in range(3)]
+ROADBRIDGE_ROWS = ["roadbridge_shadow"] + [f"roadbridge_{i}" for i in range(6)]
+BRIDGE_ROWS = FOOTBRIDGE_ROWS + ROADBRIDGE_ROWS
 
 # font: frame name, characters it draws (Greek capitals that look like Latin share)
 FONT_GLYPHS = (
