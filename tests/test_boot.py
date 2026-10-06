@@ -34,7 +34,7 @@ class BootTest(unittest.TestCase):
     def test_irq_at_fixed_line(self):
         lines = set()
         for _ in range(5):
-            regs = self.vm.run_to("irq")
+            regs = self.vm.run_to("irq_top")
             lines.add(regs["LIN"])
         self.assertEqual(len(lines), 1, lines)
         self.assertLess(lines.pop(), 3)                        # top of the frame
