@@ -51,7 +51,7 @@ video_init
         sta VIC_SPR_YEXP
         sta VIC_SPR_XEXP
         sta VIC_SPR_PRIO
-        lda #%001
+        lda #%1000001           ; multicolor: 0 the body, 6 the power-up
         sta VIC_SPR_MC
         lda #SPRITE_MC0
         sta VIC_SPR_MC0
@@ -62,6 +62,10 @@ video_init
         lda #BLACK
         sta VIC_SPR_COL+1
         sta VIC_SPR_COL+2
+        lda #SPR_FLYERS_COIN0_COL ; 3-5 flying coins
+        sta VIC_SPR_COL+3
+        sta VIC_SPR_COL+4
+        sta VIC_SPR_COL+5
 
         lda CIA2_DDRA           ; VIC bank 1: $4000-$7fff
         ora #3
@@ -259,12 +263,13 @@ scroll_advance
         beq +
         lda scroll_y
         jmp _fine
-+       lda scroll_frac
++       jsr current_speed       ; turbo / slow / speed_lo, speed_hi
+        lda scroll_frac
         clc
-        adc speed_lo
+        adc eff_lo
         sta scroll_frac
         lda scroll_y
-        adc speed_hi
+        adc eff_hi
         cmp #8
         bcc _fine
         ldx copy_stage
@@ -277,7 +282,7 @@ scroll_advance
         sta scroll_cmd
         and #7
         sta scroll_y
-        rts
+        jmp score_row           ; the world moved a row
 _stall  inc stalls              ; hidden buffer not ready: hold at 7
         lda #0
         sta scroll_frac

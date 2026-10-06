@@ -36,6 +36,7 @@ class Scroll:
         vm = self.vm
         vm.run_frames(3)
         vm.poke("no_crash", 1)                   # obstacles do not stop the world here
+        vm.poke("no_pickups", 1)                 # nor do items change the picture
         whole = int(speed)
         vm.poke("speed_lo", int(round((speed - whole) * 256)) & 0xFF)
         vm.poke("speed_hi", whole)

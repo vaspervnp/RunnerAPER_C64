@@ -8,6 +8,7 @@
 WORLD_RING      = $0400                 ; 64 row descriptors x 16 bytes
 WSTATE          = $c000                 ; generator state (world.asm)
 PSTATE          = $c100                 ; the runner (player.asm)
+KSTATE          = $c200                 ; coins, power-ups, score (pickups.asm)
 
 ; text: our font's codes (assets64.FONT_GLYPHS: space, a-z, 0-9, ...)
         .enc "game"
@@ -58,6 +59,7 @@ game_start
         sta VIC_IRQ_MASK
         sta restart
         jsr world_init
+        jsr pickups_init
         jsr video_init
         jsr player_init
         lda #LIVES_START
@@ -108,8 +110,11 @@ main_loop
         bcs +
         jsr player_update
         jsr collide
-+       jsr video_frame
+        jsr play_pickups
++       jsr move_flyers
+        jsr video_frame
         jsr player_sprites
+        jsr pickup_sprites
 
         jsr measure_load
 frame_done                      ; tests put a checkpoint here
@@ -247,6 +252,7 @@ irq_split_end
         .include "world.asm"
         .include "input.asm"
         .include "player.asm"
+        .include "pickups.asm"
 code_end
 
         .cerror code_end > $4000, "code runs into the VIC bank"
@@ -264,5 +270,6 @@ sprite_blank                    ; an empty block (player.asm: cut under decks)
         * = $8000
         .include "data/chunks.asm"
         .include "data/gfx.asm"
+        .include "data/text.asm"
 data_end
         .cerror data_end > WSTATE, "data runs into the generator state"

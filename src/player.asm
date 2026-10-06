@@ -99,6 +99,7 @@ _jump   lda arc_len
         bne +
         ldx #ARC_GROUND
         lda pu_spring                   ; springs: super jump from the ground
+        ora pu_spring+1
         beq +
         ldx #ARC_SPRING
 +       stx arc_ofs
@@ -657,39 +658,71 @@ jump_frames_down
 ; pointer of a line is fetched at the end of the line before, so the write
 ; happens on line L-1 for line L; the IRQ comes on L-2 and waits).
 ; -----------------------------------------------------------------------------
-sprites_irq
+sprites_irq                             ; (unrolled: ~250 cycles)
         lda spr_ena
         sta VIC_SPR_ENA
-        ldx #2
--       txa
-        asl a
-        tay
-        lda spr_x,x
-        sta VIC_SPR_X,y
-        lda spr_y,x
-        sta VIC_SPR_Y,y
-        lda spr_ptr,x
-        ldy clip_top
+        lda spr_col6
+        sta VIC_SPR_COL+6
+        .for k = 0, k < 7, k += 1
+        lda spr_x+k
+        sta VIC_SPR_X+2*k
+        lda spr_y+k
+        sta VIC_SPR_Y+2*k
+        .endfor
+        lda clip_top                    ; the runner's three: cut from the top?
         beq +
         lda #BLANK_BLOCK
-+       sta SCREEN_A + $3f8,x
-        sta SCREEN_B + $3f8,x
-        dex
-        bpl -
+        .for k = 0, k < 3, k += 1
+        sta SCREEN_A + $3f8 + k
+        sta SCREEN_B + $3f8 + k
+        .endfor
+        jmp ++
++
+        .for k = 0, k < 3, k += 1
+        lda spr_ptr+k
+        sta SCREEN_A + $3f8 + k
+        sta SCREEN_B + $3f8 + k
+        .endfor
++
+        .for k = 3, k < 7, k += 1
+        lda spr_ptr+k
+        sta SCREEN_A + $3f8 + k
+        sta SCREEN_B + $3f8 + k
+        .endfor
         rts
 
-; A = line L: wait for L-1, then the three pointers (empty or the frames)
+; A = line L: wait for L-1, then the three pointers (empty or the frames).
+; The sprites 3-7 fetch at the start of L-1 and hold the CPU: the screen
+; shown gets them first, three stores right after the wait, before the
+; fetch of sprite 0 at the end of the line.
 clip_write
         sec
         sbc #1
+        ldx cur_buf
+        bne _b
+        ldx clip_ptrs
+        ldy clip_ptrs+1
 -       cmp VIC_RASTER
         bne -
-        ldx #2
--       lda clip_ptrs,x
-        sta SCREEN_A + $3f8,x
-        sta SCREEN_B + $3f8,x
-        dex
-        bpl -
+        stx SCREEN_A + $3f8
+        sty SCREEN_A + $3f9
+        lda clip_ptrs+2
+        sta SCREEN_A + $3fa
+        stx SCREEN_B + $3f8
+        sty SCREEN_B + $3f9
+        sta SCREEN_B + $3fa
+        rts
+_b      ldx clip_ptrs
+        ldy clip_ptrs+1
+-       cmp VIC_RASTER
+        bne -
+        stx SCREEN_B + $3f8
+        sty SCREEN_B + $3f9
+        lda clip_ptrs+2
+        sta SCREEN_B + $3fa
+        stx SCREEN_A + $3f8
+        sty SCREEN_A + $3f9
+        sta SCREEN_A + $3fa
         rts
 
 ; -----------------------------------------------------------------------------
@@ -723,12 +756,12 @@ lives           .byte ?
 invuln          .byte ?                 ; frames still protected (blinking)
 helmet          .byte ?                 ; phase 6: the next crash is absorbed
 no_crash        .byte ?                 ; test switch: obstacles never crash
-pu_spring       .byte ?                 ; phase 6
 runner_top      .byte ?
 spr_ena         .byte ?                 ; sprite registers for the next frame
-spr_x           .fill 3
-spr_y           .fill 3
-spr_ptr         .fill 3
+spr_x           .fill 7                 ; 0-2 runner, 3-5 coins, 6 power-up
+spr_y           .fill 7
+spr_ptr         .fill 7
+spr_col6        .byte ?
 clip_top        .byte ?                 ; cut from the first line on
 clip_on         .byte ?                 ; line where a deck starts cutting (0: none)
 clip_off        .byte ?                 ; line after the deck (0: none)

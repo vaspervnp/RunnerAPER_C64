@@ -54,5 +54,16 @@ irq_clip_on     = $3b           ; the clip lines of this frame (latched by the t
 irq_clip_off    = $3c
 irq_ptrs        = $3d           ; 3 bytes: the sprites' frames this frame
 gap_hard        = $40           ; hard: the gaps between wagons are holes
+language        = $41           ; 0 English, 1 Greek (text tables)
+ptr4            = $42           ; pickups.asm
+ptr5            = $44
+pc_char         = $46           ; put_cell
+pc_row          = $47
+lb_col          = $48           ; show_label
+lb_i            = $49
+mg_row          = $4a           ; magnet
+pk_lane         = $4b
+eff_lo          = $4c           ; scroll speed with the power-ups
+eff_hi          = $4d
 
 ZP_END          = $90

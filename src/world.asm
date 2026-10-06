@@ -1225,7 +1225,8 @@ spawn_item
 
 ; =============================================================================
 ; render_row: the descriptor of world row A (low byte) -> 40 characters at
-; (ptr). Coins are their character in the lane's middle column.
+; (ptr). Coins are their character in the lane's middle column; a power-up
+; is noted for its sprite (vis_*: A must be gen_row).
 ; =============================================================================
 render_row
         jsr desc_index
@@ -1286,9 +1287,17 @@ _lane   stx ck
         adc #D_ITEM
         tay
         lda (dp),y
+        beq _nocoin
         cmp #ITEM_COIN
-        bne _nocoin
-        tya
+        beq _coin
+        sta vis_kind                    ; a power-up: sprite 6 (pickups.asm)
+        stx vis_lane
+        lda gen_row
+        sta vis_row
+        lda gen_row+1
+        sta vis_row+1
+        jmp _nocoin
+_coin   tya
         sec
         sbc #D_ITEM-D_COLL
         tay

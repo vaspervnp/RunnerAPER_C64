@@ -123,12 +123,14 @@ RUNNER_FRAMES = ([f"s1_{f}" for f in ("run0", "run1", "run2", "run3", "lean_l", 
                                          "jump_up", "jump_down", "crash0", "crash1")]
                  + ["s4_jump_up", "s4_jump_down", "s5_jump"])
 SHADOWS = ["sh_ground", "sh_roof"]
+FLYERS = [f"coin{p}" for p in range(4)]      # magnet: a coin flying to the runner
 SPRITE_SHEETS = {
     # multicolor body (sprite 0) + hires outline (sprite 1) per frame
     "runner": dict(frames=RUNNER_FRAMES, mc=True),
     "runner_outline": dict(frames=RUNNER_FRAMES, mc=False),
     "powerups": dict(frames=POWERUPS, mc=True),
     "shadow": dict(frames=SHADOWS, mc=False),
+    "flyers": dict(frames=FLYERS, mc=False),
 }
 
 # the empty sprite block after the converted ones: a runner under a bridge

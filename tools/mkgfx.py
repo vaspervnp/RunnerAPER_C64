@@ -758,6 +758,20 @@ def shadow_sheet():
     return out
 
 
+def flyer_sheet():
+    """Hires yellow coins (the track's 4 phases, pixels doubled) in the top
+    left 8x8 of the sprite, where the coin character was; the shine is a hole."""
+    out = []
+    for p, shape in enumerate(coin_shapes()):
+        img = blank(24, 21, TRANSPARENT)
+        for y, row in enumerate(shape):
+            for x, c in enumerate(row):
+                if c == colour("yellow"):
+                    img[y][2 * x] = img[y][2 * x + 1] = c
+        out.append((f"coin{p}", img))
+    return out
+
+
 SHEET_MAKERS = {
     "track": track_sheet,
     "coins": coins_sheet,
@@ -770,6 +784,7 @@ SHEET_MAKERS = {
     "runner_outline": lambda: runner_sheets()[1],
     "powerups": powerup_sheet,
     "shadow": shadow_sheet,
+    "flyers": flyer_sheet,
 }
 
 
