@@ -69,7 +69,8 @@ class Vice:
     """A running x64sc with the game autostarted, stopped in the monitor
     between calls (every command stops the emulation; `cont` resumes it)."""
 
-    def __init__(self, image=PRG, extra_args=(), boot_timeout=30.0):
+    def __init__(self, image=PRG, extra_args=(), boot_timeout=30.0, play=True):
+        """play: past the menu at once, a game running (restart: no countdown)."""
         self.labels = load_labels()
         self.port = free_port()
         args = [X64, "-console", "-default", "-warp", "-silent", "-sounddev", "dummy",
@@ -91,6 +92,9 @@ class Vice:
                 time.sleep(0.05)
         self._banks = None
         self._regs = None
+        if play:
+            self.run_to("frame_done")
+            self.poke("restart", 1)
 
     # -- context manager --------------------------------------------------
     def __enter__(self):

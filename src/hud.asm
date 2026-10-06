@@ -74,11 +74,7 @@ hud_init
 -       sta HUD_CRAM+HUD_COINS_X,x
         dex
         bpl -
-        ldx #ROUTE_LAST                 ; the route without the runner
--       jsr route_cell
-        dex
-        cpx #ROUTE_FIRST
-        bcs -
+        jsr hud_route                   ; the route (and the runner, next update)
         ldx #5                          ; power-up icons (their colour: update)
 -       txa
         asl a
@@ -100,6 +96,17 @@ hud_init
 -       sta hud_shown,x
         dex
         bpl -
+        rts
+
+; the route without the runner; the runner drawn by the next update
+hud_route
+        ldx #ROUTE_LAST
+-       jsr route_cell
+        dex
+        cpx #ROUTE_FIRST
+        bcs -
+        lda #$ff
+        sta shown_route
         rts
 
 ; X = route column: its character without the runner, both screens + colour

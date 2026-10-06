@@ -67,5 +67,9 @@ eff_lo          = $4c           ; scroll speed with the power-ups
 eff_hi          = $4d
 best            = $4e           ; best score (BCD, 3 bytes), kept between games
 hud_i           = $51
+game_mode       = $52           ; screens.asm: MODE_*
+music_on        = $53
+sound_on        = $54
+lb_row          = $55           ; show_label_at
 
 ZP_END          = $90

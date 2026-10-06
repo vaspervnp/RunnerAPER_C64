@@ -12,6 +12,7 @@ from vice import Vice
 
 COL_NONE, COL_STOP, COL_SIGNAL, COL_TRAIN, COL_NOSE, COL_RAMP_UP, COL_RAMP_DOWN, COL_GAP = range(8)
 STATE_RUN, STATE_CRASHED, STATE_GAME_OVER = range(3)
+MODE_OVER = 5
 KEY_LEFT, KEY_RIGHT, KEY_JUMP, KEY_DOWN = 1, 2, 4, 8
 WORLD_RING = 0x0400
 AHEAD = 6                       # rows below the top of the screen where planting starts
@@ -253,7 +254,7 @@ class CollisionTest(unittest.TestCase):
         self.assertTrue(all(s["crashes"] == 0 and s["state"] == STATE_RUN for s in states))
         self.assertEqual(sc.vm.peek8("helmet"), 0)
 
-    def test_game_over_then_a_new_run(self):
+    def test_game_over_then_the_score_screen(self):
         sc = self.scenario()
         sc.vm.poke("lives", 1)
         sc.plant_lane(0, 1, stop())
@@ -262,8 +263,7 @@ class CollisionTest(unittest.TestCase):
         states = sc.run(100)
         self.assertTrue(any(s["state"] == STATE_GAME_OVER for s in states))
         sc.run(180)
-        st = sc.state()
-        self.assertEqual((st["state"], st["lives"]), (STATE_RUN, 3), "phase 8: the score screen")
+        self.assertEqual(sc.vm.peek8("game_mode"), MODE_OVER, "the game over screen")
 
     def wagons(self, hard, jump):
         """Up a ramp onto two wagons joined by a coupler (row 3 + 12)."""

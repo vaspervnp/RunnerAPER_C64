@@ -154,14 +154,30 @@ video_irq_top
         lda cur_buf             ; coarse step: swap screens
         eor #1
         sta cur_buf
-        tax
-        lda d018_values,x
-        sta VIC_MEM
         inc disp_top
         bne +
         inc disp_top+1
-+       lda #DARK_GREY          ; the playfield's background (the HUD has its own)
++       ldx cur_buf             ; screen, charset, colours (the HUD has its own)
+        lda game_mode
+        bne _still
+        lda d018_values,x
+        sta VIC_MEM
+        lda #DARK_GREY
         sta VIC_BG0
+        lda #LIGHT_GREY
+        sta VIC_BG1
+        lda #GREY
+        sta VIC_BG2
+        jmp _set_y
+_still  lda d018_menu,x         ; a still screen: menu charset, the logo's colours
+        sta VIC_MEM
+        lda #BLACK
+        sta VIC_BG0
+        lda #LOGO_MC1
+        sta VIC_BG1
+        lda #LOGO_MC2_TOP
+        sta VIC_BG2
+_set_y
         lda scroll_cmd
         and #7
         sta scroll_cmd          ; consumed: no second swap if the main loop is late
@@ -211,7 +227,14 @@ split_w1_at
         bne -
         lda #D011_ON | D011_ECM | 7
         sta VIC_CTRL1           ; W3: YSCROLL 7, next match is $df
-_band   ldx #D011_ON | 7
+_band   ldx cur_buf                 ; the game's charset and colours for the HUD
+        lda d018_values,x       ; (still screens: the menu's above)
+        sta VIC_MEM
+        lda #LIGHT_GREY
+        sta VIC_BG1
+        lda #GREY
+        sta VIC_BG2
+        ldx #D011_ON | 7
         ldy #SPLIT_DELAY
         lda #HUD_TOP-1
 -       cmp VIC_RASTER

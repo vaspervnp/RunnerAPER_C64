@@ -9,6 +9,8 @@ WORLD_RING      = $0400                 ; 64 row descriptors x 16 bytes
 WSTATE          = $c000                 ; generator state (world.asm)
 PSTATE          = $c100                 ; the runner (player.asm)
 KSTATE          = $c200                 ; coins, power-ups, score (pickups.asm)
+MSTATE          = $c300                 ; menus, high scores (screens.asm)
+MENU_CHARSET    = $6000                 ; font + logo (tools/mklogo64.py)
 
 ; text: our font's codes (assets64.FONT_GLYPHS: space, a-z, 0-9, ...)
         .enc "game"
@@ -50,9 +52,9 @@ start
         cpx #ZP_END
         bne -
 
-        lda #$02                ; best score until the table (phase 8): 20000
-        sta best+2
-        jsr game_start
+        jsr flow_init           ; high scores (from the disk), menu state
+        jsr game_start          ; a world behind the menu, the HUD
+        jsr go_menu
         jmp main_loop
 
 ; a new game at the current skill: world, screens, IRQs
@@ -61,6 +63,9 @@ game_start
         lda #0
         sta VIC_IRQ_MASK
         sta restart
+        sta game_mode           ; MODE_PLAY (start_game: the countdown)
+        sta countdown
+        sta paused
         jsr world_init
         jsr pickups_init
         jsr video_init
@@ -110,16 +115,27 @@ main_loop
         sta frame_flag
 
         jsr read_input
-        jsr game_state_update   ; crashed / over: the world stands
+        lda game_mode
+        beq _play
+        jsr screen_frame        ; a still screen
+        jmp _done
+_play   jsr play_input          ; countdown, pause, RUN/STOP
+        bcc +
+        lda game_mode
+        bne _done               ; (now a still screen)
+        beq _still
++       jsr game_state_update   ; crashed / over: the world stands
         bcs +
         jsr player_update
         jsr collide
         jsr play_pickups
-+       jsr move_flyers
++       lda game_mode           ; (game over: the score screen now)
+        bne _done
+        jsr move_flyers
         jsr video_frame
-        jsr player_sprites
+_still  jsr player_sprites
         jsr pickup_sprites
-        jsr hud_update
+_done   jsr hud_update
 
         jsr measure_load
 frame_done                      ; tests put a checkpoint here
@@ -182,7 +198,13 @@ irq_top_done                    ; tests: the picture of this frame is set
         bne +
         inc frame_counter+1
 +       inc frame_flag
-        lda irq_clip_on
+        lda game_mode           ; a still screen: the logo's colour change
+        beq +
+        lda #LOGO_IRQ_LINE
+        ldx #<irq_logo_h
+        ldy #>irq_logo_h
+        jmp irq_next
++       lda irq_clip_on
         beq +
         sec
         sbc #CLIP_LEAD
@@ -259,6 +281,8 @@ irq_split_end
         .include "player.asm"
         .include "pickups.asm"
         .include "hud.asm"
+        .include "screens.asm"
+        .include "disk.asm"
 code_end
 
         .cerror code_end > $4000, "code runs into the VIC bank"
@@ -271,11 +295,15 @@ sprites
         .binary "data/sprites.bin"
 sprite_blank                    ; an empty block (player.asm: cut under decks)
         .fill 64, 0
+        .cerror * > MENU_CHARSET, "sprites run into the menu charset"
+        * = MENU_CHARSET
+        .binary "data/menu_charset.bin"
 
 ; --- data ---------------------------------------------------------------------
         * = $8000
         .include "data/chunks.asm"
         .include "data/gfx.asm"
         .include "data/text.asm"
+        .include "data/logo.asm"
 data_end
         .cerror data_end > WSTATE, "data runs into the generator state"

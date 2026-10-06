@@ -378,8 +378,7 @@ _game_over
         sec
         rts
 _new_run
-        lda #1                          ; phase 8: the score screen
-        sta restart
+        jsr game_finished               ; the game over screen
         sec
         rts
 

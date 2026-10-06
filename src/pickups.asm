@@ -499,25 +499,13 @@ stations
 _ret    rts
 
 ; A = text number: written centred on the track, in screen row LABEL_ROW
+; (show_label_at: row X)
 show_label
-        ldx language
-        beq +
--       clc
-        adc #TXT_COUNT
-        dex
-        bne -
-+       tax
-        lda text_lo,x
-        sta ptr5
-        lda text_hi,x
-        sta ptr5+1
-        ldy #0                          ; length
--       lda (ptr5),y
-        cmp #TEXT_END
-        beq +
-        iny
-        bne -
-+       sty lb_col
+        ldx #LABEL_ROW
+show_label_at
+        stx lb_row
+        jsr text_addr                   ; ptr5, Y = length (screens.asm)
+        sty lb_col
         lda #3*TRACK_COLS + 1           ; first column: centred
         sec
         sbc lb_col
@@ -536,7 +524,7 @@ _char   sty lb_i
         adc lb_col
         tay
         pla
-        ldx #LABEL_ROW
+        ldx lb_row
         jsr put_cell
         ldy lb_i
         iny
