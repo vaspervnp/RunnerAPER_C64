@@ -1,0 +1,79 @@
+{
+ "frames": [
+  {
+   "filename": "coin_rail_0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 4,
+    "h": 8
+   }
+  },
+  {
+   "filename": "coin_rail_1",
+   "frame": {
+    "x": 4,
+    "y": 0,
+    "w": 4,
+    "h": 8
+   }
+  },
+  {
+   "filename": "coin_rail_2",
+   "frame": {
+    "x": 8,
+    "y": 0,
+    "w": 4,
+    "h": 8
+   }
+  },
+  {
+   "filename": "coin_rail_3",
+   "frame": {
+    "x": 12,
+    "y": 0,
+    "w": 4,
+    "h": 8
+   }
+  },
+  {
+   "filename": "coin_roof_0",
+   "frame": {
+    "x": 16,
+    "y": 0,
+    "w": 4,
+    "h": 8
+   }
+  },
+  {
+   "filename": "coin_roof_1",
+   "frame": {
+    "x": 20,
+    "y": 0,
+    "w": 4,
+    "h": 8
+   }
+  },
+  {
+   "filename": "coin_roof_2",
+   "frame": {
+    "x": 24,
+    "y": 0,
+    "w": 4,
+    "h": 8
+   }
+  },
+  {
+   "filename": "coin_roof_3",
+   "frame": {
+    "x": 28,
+    "y": 0,
+    "w": 4,
+    "h": 8
+   }
+  }
+ ],
+ "meta": {
+  "pixel_aspect": "2:1"
+ }
+}

@@ -1,0 +1,16 @@
+{
+ "frames": [
+  {
+   "filename": "shadow",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 21
+   }
+  }
+ ],
+ "meta": {
+  "pixel_aspect": "1:1"
+ }
+}

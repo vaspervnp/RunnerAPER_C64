@@ -3,6 +3,10 @@
 #   make run    -> x64sc with autostart
 #   make test   -> headless tests (VICE binary monitor)
 #   make shot   -> headless run, screenshot in build/shot.png
+#   make gfx    -> src/data/ (charset, tiles, sprites) from gfx/png
+#   make mockup -> build/mockup_*.png, game screens made from src/data
+#   (gfx/png is the source art: tools/mkgfx.py drew the first version, edit
+#    it in Aseprite; rerun mkgfx.py only for sheets nobody has painted over)
 
 X64     ?= x64sc
 C1541   ?= c1541
@@ -11,6 +15,9 @@ PYTHON  ?= python3
 
 BUILD   := build
 SRC     := $(wildcard src/*.asm src/*.inc)
+GFX_IN  := $(wildcard gfx/png/*.png gfx/png/*.json)
+GFX_TOOLS := tools/c64palette.py tools/assets64.py tools/png2c64.py
+GFX_STAMP := src/data/.stamp
 PRG     := $(BUILD)/runner.prg
 D64     := $(BUILD)/runner.d64
 LABELS  := $(BUILD)/labels.txt
@@ -20,14 +27,24 @@ LIST    := $(BUILD)/runner.lst
 # -i NMOS 6510 (illegal opcodes allowed), -Wall all warnings
 TASSFLAGS := -C -a -B -i -Wall -I src
 
-.PHONY: all run test shot clean
+.PHONY: all run test shot clean gfx mockup
 
 all: $(D64)
 
 $(BUILD):
 	mkdir -p $@
 
-$(PRG): $(SRC) | $(BUILD)
+gfx: $(GFX_STAMP)
+
+$(GFX_STAMP): $(GFX_IN) $(GFX_TOOLS)
+	$(PYTHON) tools/png2c64.py
+	touch $@
+
+mockup: $(GFX_STAMP)
+	$(PYTHON) tools/mockup64.py
+	$(PYTHON) tools/mockup64.py brown
+
+$(PRG): $(SRC) $(GFX_STAMP) | $(BUILD)
 	$(TASS) $(TASSFLAGS) src/main.asm -o $@ --vice-labels-numeric -l $(LABELS) -L $(LIST)
 
 $(D64): $(PRG)
@@ -45,4 +62,4 @@ shot: $(D64)
 	       -limitcycles 8000000 -exitscreenshot $(BUILD)/shot.png >/dev/null 2>&1 || true
 
 clean:
-	rm -rf $(BUILD)
+	rm -rf $(BUILD) src/data

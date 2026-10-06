@@ -1,0 +1,223 @@
+{
+ "frames": [
+  {
+   "filename": "road_a",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 40,
+    "h": 8
+   }
+  },
+  {
+   "filename": "road_b",
+   "frame": {
+    "x": 40,
+    "y": 0,
+    "w": 40,
+    "h": 8
+   }
+  },
+  {
+   "filename": "road_cross_0",
+   "frame": {
+    "x": 80,
+    "y": 0,
+    "w": 40,
+    "h": 8
+   }
+  },
+  {
+   "filename": "road_cross_1",
+   "frame": {
+    "x": 120,
+    "y": 0,
+    "w": 40,
+    "h": 8
+   }
+  },
+  {
+   "filename": "kiosk_0",
+   "frame": {
+    "x": 160,
+    "y": 0,
+    "w": 40,
+    "h": 8
+   }
+  },
+  {
+   "filename": "kiosk_1",
+   "frame": {
+    "x": 200,
+    "y": 0,
+    "w": 40,
+    "h": 8
+   }
+  },
+  {
+   "filename": "car_0",
+   "frame": {
+    "x": 240,
+    "y": 0,
+    "w": 40,
+    "h": 8
+   }
+  },
+  {
+   "filename": "car_1",
+   "frame": {
+    "x": 280,
+    "y": 0,
+    "w": 40,
+    "h": 8
+   }
+  },
+  {
+   "filename": "ground_a",
+   "frame": {
+    "x": 320,
+    "y": 0,
+    "w": 40,
+    "h": 8
+   }
+  },
+  {
+   "filename": "ground_b",
+   "frame": {
+    "x": 360,
+    "y": 0,
+    "w": 40,
+    "h": 8
+   }
+  },
+  {
+   "filename": "path",
+   "frame": {
+    "x": 400,
+    "y": 0,
+    "w": 40,
+    "h": 8
+   }
+  },
+  {
+   "filename": "fence",
+   "frame": {
+    "x": 440,
+    "y": 0,
+    "w": 40,
+    "h": 8
+   }
+  },
+  {
+   "filename": "tree_0",
+   "frame": {
+    "x": 480,
+    "y": 0,
+    "w": 40,
+    "h": 8
+   }
+  },
+  {
+   "filename": "tree_1",
+   "frame": {
+    "x": 520,
+    "y": 0,
+    "w": 40,
+    "h": 8
+   }
+  },
+  {
+   "filename": "bush",
+   "frame": {
+    "x": 560,
+    "y": 0,
+    "w": 40,
+    "h": 8
+   }
+  },
+  {
+   "filename": "trans_uf_0",
+   "frame": {
+    "x": 600,
+    "y": 0,
+    "w": 40,
+    "h": 8
+   }
+  },
+  {
+   "filename": "trans_uf_1",
+   "frame": {
+    "x": 640,
+    "y": 0,
+    "w": 40,
+    "h": 8
+   }
+  },
+  {
+   "filename": "trans_fu_0",
+   "frame": {
+    "x": 680,
+    "y": 0,
+    "w": 40,
+    "h": 8
+   }
+  },
+  {
+   "filename": "trans_fu_1",
+   "frame": {
+    "x": 720,
+    "y": 0,
+    "w": 40,
+    "h": 8
+   }
+  },
+  {
+   "filename": "plat_end",
+   "frame": {
+    "x": 760,
+    "y": 0,
+    "w": 40,
+    "h": 8
+   }
+  },
+  {
+   "filename": "plat_plain",
+   "frame": {
+    "x": 800,
+    "y": 0,
+    "w": 40,
+    "h": 8
+   }
+  },
+  {
+   "filename": "plat_bench",
+   "frame": {
+    "x": 840,
+    "y": 0,
+    "w": 40,
+    "h": 8
+   }
+  },
+  {
+   "filename": "plat_roof",
+   "frame": {
+    "x": 880,
+    "y": 0,
+    "w": 40,
+    "h": 8
+   }
+  },
+  {
+   "filename": "plat_sign",
+   "frame": {
+    "x": 920,
+    "y": 0,
+    "w": 40,
+    "h": 8
+   }
+  }
+ ],
+ "meta": {
+  "pixel_aspect": "2:1"
+ }
+}

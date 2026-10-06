@@ -1,0 +1,169 @@
+{
+ "frames": [
+  {
+   "filename": "ic_magnet",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 8,
+    "h": 8
+   }
+  },
+  {
+   "filename": "ic_turbo",
+   "frame": {
+    "x": 8,
+    "y": 0,
+    "w": 8,
+    "h": 8
+   }
+  },
+  {
+   "filename": "ic_slow",
+   "frame": {
+    "x": 16,
+    "y": 0,
+    "w": 8,
+    "h": 8
+   }
+  },
+  {
+   "filename": "ic_spring",
+   "frame": {
+    "x": 24,
+    "y": 0,
+    "w": 8,
+    "h": 8
+   }
+  },
+  {
+   "filename": "ic_helmet",
+   "frame": {
+    "x": 32,
+    "y": 0,
+    "w": 8,
+    "h": 8
+   }
+  },
+  {
+   "filename": "ic_ticket",
+   "frame": {
+    "x": 40,
+    "y": 0,
+    "w": 8,
+    "h": 8
+   }
+  },
+  {
+   "filename": "ic_coin",
+   "frame": {
+    "x": 48,
+    "y": 0,
+    "w": 8,
+    "h": 8
+   }
+  },
+  {
+   "filename": "ic_life",
+   "frame": {
+    "x": 56,
+    "y": 0,
+    "w": 8,
+    "h": 8
+   }
+  },
+  {
+   "filename": "bar0",
+   "frame": {
+    "x": 64,
+    "y": 0,
+    "w": 4,
+    "h": 8
+   }
+  },
+  {
+   "filename": "bar1",
+   "frame": {
+    "x": 68,
+    "y": 0,
+    "w": 4,
+    "h": 8
+   }
+  },
+  {
+   "filename": "bar2",
+   "frame": {
+    "x": 72,
+    "y": 0,
+    "w": 4,
+    "h": 8
+   }
+  },
+  {
+   "filename": "bar3",
+   "frame": {
+    "x": 76,
+    "y": 0,
+    "w": 4,
+    "h": 8
+   }
+  },
+  {
+   "filename": "bar4",
+   "frame": {
+    "x": 80,
+    "y": 0,
+    "w": 4,
+    "h": 8
+   }
+  },
+  {
+   "filename": "route_line",
+   "frame": {
+    "x": 84,
+    "y": 0,
+    "w": 4,
+    "h": 8
+   }
+  },
+  {
+   "filename": "route_station",
+   "frame": {
+    "x": 88,
+    "y": 0,
+    "w": 4,
+    "h": 8
+   }
+  },
+  {
+   "filename": "route_here",
+   "frame": {
+    "x": 92,
+    "y": 0,
+    "w": 4,
+    "h": 8
+   }
+  },
+  {
+   "filename": "route_start",
+   "frame": {
+    "x": 96,
+    "y": 0,
+    "w": 4,
+    "h": 8
+   }
+  },
+  {
+   "filename": "route_end",
+   "frame": {
+    "x": 100,
+    "y": 0,
+    "w": 4,
+    "h": 8
+   }
+  }
+ ],
+ "meta": {
+  "pixel_aspect": "2:1"
+ }
+}

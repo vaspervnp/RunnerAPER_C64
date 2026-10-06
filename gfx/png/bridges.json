@@ -1,0 +1,79 @@
+{
+ "frames": [
+  {
+   "filename": "footbridge_0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 8
+   }
+  },
+  {
+   "filename": "footbridge_1",
+   "frame": {
+    "x": 160,
+    "y": 0,
+    "w": 160,
+    "h": 8
+   }
+  },
+  {
+   "filename": "footbridge_2",
+   "frame": {
+    "x": 320,
+    "y": 0,
+    "w": 160,
+    "h": 8
+   }
+  },
+  {
+   "filename": "roadbridge_0",
+   "frame": {
+    "x": 480,
+    "y": 0,
+    "w": 160,
+    "h": 8
+   }
+  },
+  {
+   "filename": "roadbridge_1",
+   "frame": {
+    "x": 640,
+    "y": 0,
+    "w": 160,
+    "h": 8
+   }
+  },
+  {
+   "filename": "roadbridge_2",
+   "frame": {
+    "x": 800,
+    "y": 0,
+    "w": 160,
+    "h": 8
+   }
+  },
+  {
+   "filename": "roadbridge_3",
+   "frame": {
+    "x": 960,
+    "y": 0,
+    "w": 160,
+    "h": 8
+   }
+  },
+  {
+   "filename": "roadbridge_4",
+   "frame": {
+    "x": 1120,
+    "y": 0,
+    "w": 160,
+    "h": 8
+   }
+  }
+ ],
+ "meta": {
+  "pixel_aspect": "2:1"
+ }
+}

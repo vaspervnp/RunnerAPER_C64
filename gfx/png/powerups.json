@@ -1,0 +1,61 @@
+{
+ "frames": [
+  {
+   "filename": "magnet",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 21
+   }
+  },
+  {
+   "filename": "turbo",
+   "frame": {
+    "x": 12,
+    "y": 0,
+    "w": 12,
+    "h": 21
+   }
+  },
+  {
+   "filename": "slow",
+   "frame": {
+    "x": 24,
+    "y": 0,
+    "w": 12,
+    "h": 21
+   }
+  },
+  {
+   "filename": "spring",
+   "frame": {
+    "x": 36,
+    "y": 0,
+    "w": 12,
+    "h": 21
+   }
+  },
+  {
+   "filename": "helmet",
+   "frame": {
+    "x": 48,
+    "y": 0,
+    "w": 12,
+    "h": 21
+   }
+  },
+  {
+   "filename": "ticket",
+   "frame": {
+    "x": 60,
+    "y": 0,
+    "w": 12,
+    "h": 21
+   }
+  }
+ ],
+ "meta": {
+  "pixel_aspect": "2:1"
+ }
+}

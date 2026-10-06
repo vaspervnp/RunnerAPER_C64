@@ -1,0 +1,277 @@
+{
+ "frames": [
+  {
+   "filename": "rail_a",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "rail_b",
+   "frame": {
+    "x": 28,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "stop_0",
+   "frame": {
+    "x": 56,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "stop_1",
+   "frame": {
+    "x": 84,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "signal_0",
+   "frame": {
+    "x": 112,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "signal_1",
+   "frame": {
+    "x": 140,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "wagon1_end_bottom",
+   "frame": {
+    "x": 168,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "wagon1_body_a",
+   "frame": {
+    "x": 196,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "wagon1_body_b",
+   "frame": {
+    "x": 224,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "wagon1_end_top",
+   "frame": {
+    "x": 252,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "wagon1_coupler",
+   "frame": {
+    "x": 280,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "wagon2_end_bottom",
+   "frame": {
+    "x": 308,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "wagon2_body_a",
+   "frame": {
+    "x": 336,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "wagon2_body_b",
+   "frame": {
+    "x": 364,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "wagon2_end_top",
+   "frame": {
+    "x": 392,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "wagon2_coupler",
+   "frame": {
+    "x": 420,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "loco1_nose",
+   "frame": {
+    "x": 448,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "loco1_body",
+   "frame": {
+    "x": 476,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "loco1_pantograph",
+   "frame": {
+    "x": 504,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "loco1_nose_top",
+   "frame": {
+    "x": 532,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "loco2_nose",
+   "frame": {
+    "x": 560,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "loco2_body",
+   "frame": {
+    "x": 588,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "loco2_pantograph",
+   "frame": {
+    "x": 616,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "loco2_nose_top",
+   "frame": {
+    "x": 644,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "ramp_up_0",
+   "frame": {
+    "x": 672,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "ramp_up_1",
+   "frame": {
+    "x": 700,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "ramp_up_2",
+   "frame": {
+    "x": 728,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "ramp_down_0",
+   "frame": {
+    "x": 756,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "ramp_down_1",
+   "frame": {
+    "x": 784,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  },
+  {
+   "filename": "ramp_down_2",
+   "frame": {
+    "x": 812,
+    "y": 0,
+    "w": 28,
+    "h": 8
+   }
+  }
+ ],
+ "meta": {
+  "pixel_aspect": "2:1"
+ }
+}
