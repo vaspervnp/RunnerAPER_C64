@@ -35,6 +35,7 @@ class Scroll:
         self.vm = Vice()
         vm = self.vm
         vm.run_frames(3)
+        vm.poke("no_crash", 1)                   # obstacles do not stop the world here
         whole = int(speed)
         vm.poke("speed_lo", int(round((speed - whole) * 256)) & 0xFF)
         vm.poke("speed_hi", whole)
@@ -168,10 +169,10 @@ class CyclesTest(unittest.TestCase):
         print()
         for k, v in sorted(results.items()):
             print(f"  {k}: {min(v)}-{max(v)} cycles")
-        # wall time: the split IRQ (~750) may fall inside a stage.
+        # wall time: the split IRQ (~750) and the sprites' DMA may fall inside a stage.
         # stage 0: 8 rows + the new row's descriptor (world.asm, ~1600-5000)
         # stage 1: 12 rows + its 40 characters
-        self.assertLess(max(results["build stage 0"]), 9000)
+        self.assertLess(max(results["build stage 0"]), 9500)    # (+ the runner's sprite DMA)
         self.assertLess(max(results["build stage 1"]), 7000)
         self.assertLess(max(results["split IRQ"]), 900)
         self.assertLess(max(results["top IRQ"]), 400)    # scroll + sprites

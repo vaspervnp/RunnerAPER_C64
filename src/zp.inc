@@ -53,5 +53,6 @@ shown_y         = $3a           ; YSCROLL of the picture shown this frame
 irq_clip_on     = $3b           ; the clip lines of this frame (latched by the top IRQ)
 irq_clip_off    = $3c
 irq_ptrs        = $3d           ; 3 bytes: the sprites' frames this frame
+gap_hard        = $40           ; hard: the gaps between wagons are holes
 
 ZP_END          = $90

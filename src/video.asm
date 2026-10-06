@@ -255,7 +255,11 @@ copy_go jmp (ptr2)
 
 ; Fine/coarse position: scroll_y += speed; a wrap needs the hidden buffer.
 scroll_advance
-        lda scroll_frac
+        lda game_state          ; crashed / over: the world stands
+        beq +
+        lda scroll_y
+        jmp _fine
++       lda scroll_frac
         clc
         adc speed_lo
         sta scroll_frac

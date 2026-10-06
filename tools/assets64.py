@@ -117,10 +117,10 @@ SPRITE_MC0 = colour("blue")
 SPRITE_MC1 = colour("light_red")
 # the runner in 5 sizes (z 0..4, as the CPC's s1..s5): s1 on the ground, s3 on a
 # roof, s2..s5 in the air
-RUNNER_FRAMES = ([f"s1_{f}" for f in ("run0", "run1", "run2", "run3", "lean_l", "lean_r")]
+RUNNER_FRAMES = ([f"s1_{f}" for f in ("run0", "run1", "run2", "run3", "lean_l", "lean_r", "crash0", "crash1")]
                  + ["s2_jump_up", "s2_jump_down"]
                  + [f"s3_{f}" for f in ("run0", "run1", "run2", "run3", "lean_l", "lean_r",
-                                         "jump_up", "jump_down")]
+                                         "jump_up", "jump_down", "crash0", "crash1")]
                  + ["s4_jump_up", "s4_jump_down", "s5_jump"])
 SHADOWS = ["sh_ground", "sh_roof"]
 SPRITE_SHEETS = {

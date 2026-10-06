@@ -30,6 +30,7 @@ class Runner:
         vm.poke("test_mode", 1)
         vm.poke("test_keys", 0)
         vm.poke("speed_hi", speed)
+        vm.poke("no_crash", 1)
         vm.run_frames(2)
 
     def close(self):

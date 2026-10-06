@@ -27,6 +27,7 @@ class WorldRun:
         vm.poke("restart", 1)
         vm.run_frames(3)
         vm.poke("speed_hi", 4)
+        vm.poke("no_crash", 1)                   # (test_collisions has the crashes)
         vm.poke("speed_lo", 0)
         for name in ("overruns", "stalls"):
             vm.poke(name, 0)

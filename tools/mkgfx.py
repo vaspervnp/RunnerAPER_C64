@@ -614,6 +614,8 @@ RUNNER_SIZES = {          # head w, head h, torso w, torso h, legs (multicolor p
 
 
 def runner_art(size, pose):
+    if pose == "crash1":
+        return crash_lying(size)
     hw, hh, tw, th, lh = RUNNER_SIZES[size]
     grid = [["."] * 12 for _ in range(21)]
 
@@ -626,7 +628,8 @@ def runner_art(size, pose):
     gap = tw - 2 * leg_w
     legs = {"run0": (lh, lh - 2), "run1": (lh - 1, lh - 1), "run2": (lh - 2, lh), "run3": (lh - 1, lh - 1),
             "lean_l": (lh - 1, lh - 1), "lean_r": (lh - 1, lh - 1),
-            "jump_up": (lh - 2, lh - 2), "jump_down": (lh - 1, lh - 1), "jump": (lh - 1, lh - 1)}[pose]
+            "jump_up": (lh - 2, lh - 2), "jump_down": (lh - 1, lh - 1), "jump": (lh - 1, lh - 1),
+            "crash0": (lh - 2, lh)}[pose]
     total = hh + 1 + th + max(legs) + 1
     top = 21 - total
     x0 = (12 - tw) // 2                       # torso left
@@ -649,7 +652,7 @@ def runner_art(size, pose):
         for x in range(x0 + shift, x0 + tw + shift):
             put(x, y + r, "r")
     # arms
-    if pose in ("jump_up", "jump"):
+    if pose in ("jump_up", "jump", "crash0"):
         for r in range(1, hh + 1):
             put(x0 - 1, shoulders - r, "s")
             put(x0 + tw, shoulders - r, "s")
@@ -665,7 +668,7 @@ def runner_art(size, pose):
         for r in range(right):
             put(x0 + tw + (lean if r < th // 2 else 0), shoulders + r, "s")
     y += th
-    spread = 1 if pose in ("jump_down", "jump") else 0
+    spread = 1 if pose in ("jump_down", "jump", "crash0") else 0
     for side, length in enumerate(legs):      # jeans and shoes
         lx = x0 - spread if side == 0 else x0 + leg_w + gap + spread
         for r in range(length):
@@ -677,6 +680,25 @@ def runner_art(size, pose):
         for x in range(x0 + leg_w, x0 + leg_w + gap):
             put(x, y, "b")
     return ["".join(row) for row in grid]
+
+
+def crash_lying(size):
+    """Knocked over: lying across the track, head left."""
+    hw, hh, tw, th, lh = RUNNER_SIZES[size]
+    length = min(12, hh + th + lh // 2 + 1)
+    width = max(3, tw // 2)                  # rows: the body seen from the side
+    rows = ["." * 12] * (21 - width - 1)
+    x0 = (12 - length) // 2
+    for k in range(width):
+        line = ["."] * 12
+        for x in range(x0, x0 + length):
+            d = x - x0
+            line[x] = "h" if d < hh - 1 else "s" if d < hh else "r" if d < hh + th - 1 else "b"
+        if k == width - 1:
+            line[x0 + length - 1] = "k"
+        rows.append("".join(line))
+    rows.append("." * 12)
+    return rows
 
 
 RUNNER_ART = {name: runner_art(int(name[1]), name[3:]) for name in A.RUNNER_FRAMES}

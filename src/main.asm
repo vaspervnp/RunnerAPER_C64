@@ -60,6 +60,14 @@ game_start
         jsr world_init
         jsr video_init
         jsr player_init
+        lda #LIVES_START
+        sta lives
+        ldx #0                  ; hard: jump the gaps between wagons
+        lda skill
+        cmp #2
+        bne +
+        inx
++       stx gap_hard
         jsr player_sprites
 
         lda #<irq_top
@@ -96,9 +104,11 @@ main_loop
         sta frame_flag
 
         jsr read_input
+        jsr game_state_update   ; crashed / over: the world stands
+        bcs +
         jsr player_update
         jsr collide
-        jsr video_frame
++       jsr video_frame
         jsr player_sprites
 
         jsr measure_load
