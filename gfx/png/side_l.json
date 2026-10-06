@@ -127,7 +127,7 @@
    }
   },
   {
-   "filename": "bush",
+   "filename": "tree_2",
    "frame": {
     "x": 504,
     "y": 0,
@@ -136,7 +136,7 @@
    }
   },
   {
-   "filename": "trans_uf_0",
+   "filename": "bush",
    "frame": {
     "x": 540,
     "y": 0,
@@ -145,7 +145,7 @@
    }
   },
   {
-   "filename": "trans_uf_1",
+   "filename": "trans_uf_0",
    "frame": {
     "x": 576,
     "y": 0,
@@ -154,7 +154,7 @@
    }
   },
   {
-   "filename": "trans_fu_0",
+   "filename": "trans_uf_1",
    "frame": {
     "x": 612,
     "y": 0,
@@ -163,7 +163,7 @@
    }
   },
   {
-   "filename": "trans_fu_1",
+   "filename": "trans_fu_0",
    "frame": {
     "x": 648,
     "y": 0,
@@ -172,7 +172,7 @@
    }
   },
   {
-   "filename": "plat_end",
+   "filename": "trans_fu_1",
    "frame": {
     "x": 684,
     "y": 0,
@@ -181,7 +181,7 @@
    }
   },
   {
-   "filename": "plat_plain",
+   "filename": "plat_end",
    "frame": {
     "x": 720,
     "y": 0,
@@ -190,7 +190,7 @@
    }
   },
   {
-   "filename": "plat_bench",
+   "filename": "plat_plain",
    "frame": {
     "x": 756,
     "y": 0,
@@ -199,7 +199,7 @@
    }
   },
   {
-   "filename": "plat_roof",
+   "filename": "plat_bench",
    "frame": {
     "x": 792,
     "y": 0,
@@ -208,9 +208,18 @@
    }
   },
   {
-   "filename": "plat_sign",
+   "filename": "plat_roof",
    "frame": {
     "x": 828,
+    "y": 0,
+    "w": 36,
+    "h": 8
+   }
+  },
+  {
+   "filename": "plat_sign",
+   "frame": {
+    "x": 864,
     "y": 0,
     "w": 36,
     "h": 8

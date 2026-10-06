@@ -228,26 +228,25 @@ def stop(part):
 
 def signal(part):
     base = rail(1)
-    if part == 0:                            # head: red lamp in the edge column
-        over(base, art(["mmm ", "mrm ", "mrm ", "mmm ", " l  "]), 0, 1)
+    if part == 0:                            # head: lit red lamp over a dark one
+        over(base, art(["lll ", "lrl ", "lrl ", "lll ", "l.l ", "l.l ", "lll ", " m  "]), 0, 0)
         return base
-    vline(base, 1, 0, 7, MC1)                # post
+    vline(base, 1, 0, 7, MC2)                # post, with its foot
+    hline(base, 0, 2, 6, MC2)
     return base
 
 
 def ramp(up, i):
-    """Ramps up onto a roof (rows 0-2, bottom to top) and down from one."""
+    """Ramps onto a roof: row 0 lowest .. row 2 highest; the grip lines get
+    closer at the bottom, which reads as a slope. Down ramps are the same rows
+    in the other order, so they cost no characters."""
+    if not up:
+        return ramp(True, 2 - i)
     base = rail(0)
+    step = (2, 3, 4)[i]
     for y in range(8):
-        hline(base, 4, 23, y, MC1)
-        base[y][3] = base[y][24] = MC2
-    shade = [6, 3, 0][i] if up else [0, 3, 6][i]
-    for y in range(8):
-        if (y + shade) % 4 == 0:             # steps
-            hline(base, 5, 22, y, MC2)
-    if up:
-        for x in (11, 12, 15, 16):           # chevrons
-            base[(x % 2) * 2 + 2][x] = LEGEND["y"]
+        hline(base, WAGON_L + 1, WAGON_R - 1, y, MC2 if y % step == 0 else MC1)
+        base[y][WAGON_L] = base[y][WAGON_R] = MC2
     return base
 
 
@@ -313,29 +312,37 @@ SIDE_CHARS = {
     "SIGN_M": ["llll", "gggg", "lglg", "lglg", "lllg", "gggg", "llll", "llll"],
     "SIGN_R": ["llll", "gggg", "glgg", "llgg", "glgg", "gggg", "llll", "llll"],
 }
-TREE = [                                     # 3 columns x 2 rows over grass
-    "   ......   ",
-    "  ..llll..  ",
-    " .llgglggl. ",
-    ".lgglgggglg.",
-    ".lgg.gglg.g.",
-    ".lglgg.gggg.",
-    ".gggg.gg.gg.",
-    ".lg.ggg.gg..",
-    ".gggg.gg.g..",
-    ".g.gg.g.g.g.",
-    " .g.g.g.g.. ",
-    " ..g.g.g... ",
-    "  ........  ",
-    "   ..mm..   ",
-    "    .mm.    ",
-    "     ..     ",
+TREE = [                                     # 4 columns x 3 rows over grass
+    "     ......     ",
+    "   ..llllll..   ",
+    "  .llggglggll.  ",
+    " .lgglggggglgg. ",
+    " .lggggglgggg.g.",
+    ".lgglgggggglgg..",
+    ".lggggg.ggggg.g.",
+    ".lgg.ggggg.gg.g.",
+    ".gggggg.gggg.g..",
+    ".lg.gggggg.gg.g.",
+    ".gggg.ggg.g.g.g.",
+    ".gg.ggg.gg.g.g..",
+    ".g.ggg.g.g.g.g..",
+    " .gg.g.g.g.g.g. ",
+    " ..g.g.g.g.g... ",
+    "  ..g.g.......  ",
+    "   ..........   ",
+    "     ..mm..     ",
+    "      .mm.      ",
+    "      .mm.      ",
+    "       ..       ",
+    "                ",
+    "                ",
+    "                ",
 ]
-for _row in range(2):
-    for _col in range(3):
+for _row in range(3):                        # row 0 = bottom
+    for _col in range(4):
         SIDE_CHARS[f"TREE_{_row}{_col}"] = [
             "".join("g" if ch == " " else ch for ch in line[_col * 4:_col * 4 + 4])
-            for line in TREE[(1 - _row) * 8:(2 - _row) * 8]]
+            for line in TREE[(2 - _row) * 8:(3 - _row) * 8]]
 
 _G = ["G1", "G2"] * 5
 _ROAD_L = ["ASPH", "ASPH", "ASPH", "ASPH", "ASPH", "KERB_L", "PAVE", "PAVE", "FENCE_L"]
@@ -352,8 +359,9 @@ SIDE_L = {
     "ground_b": _G[1:9] + ["FEDGE_L"],
     "path": ["G1", "G2", "PATH", "G2", "G1", "G2", "G1", "G2", "FEDGE_L"],
     "fence": _G[:7] + ["FENCEW", "FEDGE_L"],
-    "tree_0": ["G1", "TREE_00", "TREE_01", "TREE_02", "G2", "G1", "G2", "G1", "FEDGE_L"],
-    "tree_1": ["G2", "TREE_10", "TREE_11", "TREE_12", "G1", "G2", "G1", "G2", "FEDGE_L"],
+    "tree_0": ["G1", "TREE_00", "TREE_01", "TREE_02", "TREE_03", "G1", "G2", "G1", "FEDGE_L"],
+    "tree_1": ["G2", "TREE_10", "TREE_11", "TREE_12", "TREE_13", "G2", "G1", "G2", "FEDGE_L"],
+    "tree_2": ["G1", "TREE_20", "TREE_21", "TREE_22", "TREE_23", "G1", "G2", "G1", "FEDGE_L"],
     "bush": _G[:5] + ["BUSH"] + _G[6:8] + ["FEDGE_L"],
     "trans_uf_0": _G[:5] + ["KERB_L", "PAVE", "PAVE", "FENCE_L"],
     "trans_uf_1": _G[1:8] + ["G2", "FENCE_L"],
@@ -584,14 +592,48 @@ def sprite_from_cpc(px, mc_map):
     return body, outline
 
 
+# runner, seen from behind: r shirt (own colour), b jeans (MC0), s skin (MC1);
+# h hair and k shoes are black and go to the hires outline sprite only
+RUNNER_ART = {
+    "run0": [
+        "............", "....hhhh....", "...hhhhhh...", "...hhhhhh...", "...shhhhs...", "....ssss....",
+        "..rrrrrrrr..", ".rrrrrrrrrr.", ".rrrrrrrrrr.", ".srrrrrrrrr.", ".s.rrrrrr.r.", "...rrrrrr.s.",
+        "...bbbbbb...", "...bbbbbb...", "...bbb.bbb..", "...bb...bb..", "...bb...bb..", "...bb...kk..",
+        "...bb.......", "...bb.......", "...kk.......",
+    ],
+    "run1": [
+        "............", "....hhhh....", "...hhhhhh...", "...hhhhhh...", "...shhhhs...", "....ssss....",
+        "..rrrrrrrr..", ".rrrrrrrrrr.", ".rrrrrrrrrr.", ".rrrrrrrrrr.", ".srrrrrrrrs.", ".srrrrrrrrs.",
+        "...bbbbbb...", "...bbbbbb...", "...bb..bb...", "...bb..bb...", "...bb..bb...", "...bb..bb...",
+        "...bb..bb...", "...kk..kk...", "............",
+    ],
+}
+RUNNER_ART["run2"] = [row[::-1] for row in RUNNER_ART["run0"]]
+RUNNER_ART["run3"] = RUNNER_ART["run1"]
+
+
+def runner_frame(rows):
+    """-> (12x21 multicolor body, 24x21 hires outline: black hair, shoes and a
+    one-pixel rim around the body)."""
+    m = {"r": colour("red"), "b": A.SPRITE_MC0, "s": A.SPRITE_MC1}
+    body = [[m.get(ch, TRANSPARENT) for ch in row] for row in rows]
+    solid = [[ch != "." for ch in row for _ in (0, 1)] for row in rows]       # hires mask
+    black = colour("black")
+    outline = blank(24, 21, TRANSPARENT)
+    for y in range(21):
+        for x in range(24):
+            ch = rows[y][x // 2]
+            if ch in "hk":
+                outline[y][x] = black
+            elif not solid[y][x] and any(0 <= y + dy < 21 and 0 <= x + dx < 24 and solid[y + dy][x + dx]
+                                         for dy in (-1, 0, 1) for dx in (-1, 0, 1)):
+                outline[y][x] = black
+    return body, outline
+
+
 def runner_sheets():
-    cpc = cpc_frames("player")
-    bodies, outlines = [], []
-    for i, name in enumerate(A.RUNNER_FRAMES):
-        b, o = sprite_from_cpc(cpc[f"s3_{name}"], (colour("red"), A.SPRITE_MC0, A.SPRITE_MC1))
-        bodies.append((name, b))
-        outlines.append((name, o))
-    return bodies, outlines
+    frames = [(name, runner_frame(RUNNER_ART[name])) for name in A.RUNNER_FRAMES]
+    return [(n, b) for n, (b, _) in frames], [(n, o) for n, (_, o) in frames]
 
 
 def powerup_sheet():

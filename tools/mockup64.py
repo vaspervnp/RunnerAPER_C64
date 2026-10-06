@@ -23,12 +23,12 @@ SCALE = 3
 R, RB = "rail_a", "rail_b"
 SCENES = {
     "city": [
-        ("tree_1", [R, R, R], "ground_b"),
-        ("tree_0", [RB, "signal_0", RB], "ground_a"),
+        ("tree_1", [R, "signal_0", R], "ground_b"),
+        ("tree_0", [RB, "signal_1", RB], "ground_a"),
         "footbridge_2", "footbridge_1", "footbridge_0",
-        ("ground_a", ["wagon1_end_top", "stop_0", RB], "tree_1"),
-        ("bush", ["wagon1_body_a", "stop_1", "wagon2_end_top"], "tree_0"),
-        ("trans_fu_0", ["wagon1_body_b", R, "wagon2_body_a"], "trans_fu_0"),
+        ("ground_a", ["wagon1_end_top", "stop_0", RB], "tree_2"),
+        ("bush", ["wagon1_body_a", "stop_1", "wagon2_end_top"], "tree_1"),
+        ("trans_fu_0", ["wagon1_body_b", R, "wagon2_body_a"], "tree_0"),
         ("trans_fu_1", ["wagon1_end_bottom", RB, "wagon2_body_b+roof"], "trans_fu_1"),
         ("road_a", ["wagon1_coupler", R, "wagon2_body_a+roof"], "road_a"),
         ("road_b", ["loco1_nose_top", RB, "wagon2_body_b+roof"], "kiosk_1"),
@@ -56,9 +56,9 @@ SCENES = {
         ("plat_bench", [R, R, RB], "plat_bench"),
         ("plat_plain", [RB, RB, R], "plat_plain"),
         ("plat_end", [R, R, RB], "plat_end"),
-        ("ground_a", [RB, RB, R], "ground_b"),
-        ("path", [R, R, RB], "ground_a"),
-        ("fence", [RB, RB, R], "fence"),
+        ("tree_2", [RB, RB, R], "ground_b"),
+        ("tree_1", [R, R, RB], "ground_a"),
+        ("tree_0", [RB, RB, R], "ground_a"),
     ],
 }
 

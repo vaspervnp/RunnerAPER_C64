@@ -65,7 +65,7 @@ COINS = ["coin_rail", "coin_roof"]
 COIN_PHASES = 4
 
 SIDE_KINDS = ["road_a", "road_b", "road_cross_0", "road_cross_1", "kiosk_0", "kiosk_1",
-              "car_0", "car_1", "ground_a", "ground_b", "path", "fence", "tree_0", "tree_1",
+              "car_0", "car_1", "ground_a", "ground_b", "path", "fence", "tree_0", "tree_1", "tree_2",
               "bush", "trans_uf_0", "trans_uf_1", "trans_fu_0", "trans_fu_1",
               "plat_end", "plat_plain", "plat_bench", "plat_roof", "plat_sign"]
 BRIDGE_ROWS = [f"footbridge_{i}" for i in range(3)] + [f"roadbridge_{i}" for i in range(5)]
