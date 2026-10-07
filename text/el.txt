@@ -21,7 +21,7 @@ controls_right: → Η P : ΔΕΞΙΑ
 controls_jump: ↑ Q SPACE : ΑΛΜΑ
 controls_down: ↓ Η A : ΚΑΤΩ
 controls_pause: H : ΠΑΥΣΗ
-controls_esc: ESC : ΜΕΝΟΥ
+controls_esc: RUN/STOP : ΜΕΝΟΥ
 controls_music: M : ΜΟΥΣΙΚΗ
 controls_joy: Η JOYSTICK
 controls_back: SPACE : ΠΙΣΩ

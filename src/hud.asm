@@ -98,6 +98,43 @@ hud_init
         bpl -
         rts
 
+; A = text, X = frames: a message over the route (power-ups, stations, the
+; hard mode's hint), then the route again. The track's edge columns have red
+; colour RAM, where letters hardly show: names go here, white on blue.
+hud_message
+        stx msg_timer
+        ; fall through
+
+; A = text: centred in the route's row, both screens
+hud_text_row
+        pha
+        ldx #39
+        lda #FONT_SPACE
+-       sta HUD_A+40,x
+        sta HUD_B+40,x
+        dex
+        bpl -
+        pla
+        jsr text_addr
+        sty t8
+        tya
+        eor #$ff
+        sec
+        adc #40
+        lsr a
+        tax
+        ldy #0
+-       lda (ptr5),y
+        sta HUD_A+40,x
+        sta HUD_B+40,x
+        lda #8 | WHITE
+        sta HUD_CRAM+40,x
+        inx
+        iny
+        cpy t8
+        bne -
+        rts
+
 ; the route without the runner; the runner drawn by the next update
 hud_route
         ldx #ROUTE_LAST
@@ -229,8 +266,16 @@ _lives  lda lives
         sta HUD_A+HUD_LIVES_X
         sta HUD_B+HUD_LIVES_X
 
-        ; --- the runner on the route ---
-_route  lda route_x
+        ; --- the runner on the route (not under a message or the pause) ---
+_route  lda paused
+        bne _pu
+        lda msg_timer
+        beq _route_on
+        dec msg_timer
+        bne _pu
+        jsr hud_route                   ; the message is over
+_route_on
+        lda route_x
         cmp shown_route
         beq _pu
         ldx shown_route

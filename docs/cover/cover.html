@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Runner A.P.E.R disk cover</title>
+<!-- Print sheet for the disk case: back | spine | front, 235 x 145 mm.
+     tools/mkdocs64.py prints it to cover.pdf and cover.png / front.png. -->
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Bungee+Shade&family=Play:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  @page { size: 235mm 145mm; margin: 0; }
+  :root { --h: 145mm; --panel: 110mm; --spine: 15mm;
+          --yellow: #ffff00; --orange: #ff8000; --red: #ff0000; --blue: #000080; --bblue: #0000ff;
+          --green: #00c000; --pink: #ff8080; --pyellow: #ffff80; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { margin: 0; background: #000; font-family: Play, sans-serif; color: #fff; }
+  .sheet { display: flex; width: calc(2 * var(--panel) + var(--spine)); height: var(--h); overflow: hidden; }
+  .panel { position: relative; width: var(--panel); height: var(--h); overflow: hidden; background: #000; }
+
+  /* the machine strip, as on the 8-bit releases of the time */
+  .strip { height: 9mm; background: #000; display: flex; align-items: center; justify-content: space-between;
+           padding: 0 3mm; border-bottom: 0.8mm solid #fff; position: relative; }
+  .strip::after { content: ""; position: absolute; left: 0; right: 0; bottom: -3.2mm; height: 2.4mm;
+                  background: linear-gradient(var(--red) 0 33%, var(--green) 33% 66%, var(--bblue) 66%); }
+  .machine { font: 700 11pt Play, sans-serif; letter-spacing: 0.5mm; }
+  .machine b { color: var(--yellow); }
+  .badge { font: 9pt Bungee, sans-serif; background: var(--red); color: #fff; padding: 0.6mm 2mm;
+           transform: skewX(-12deg); border: 0.4mm solid #fff; }
+
+  /* front */
+  .art { position: absolute; top: 12.2mm; left: 0; width: var(--panel); height: 95.6mm; object-fit: cover;
+         object-position: top; border-bottom: 0.8mm solid #fff; }
+  .tag { position: absolute; top: 110mm; left: 0; right: 0; text-align: center; }
+  .tag h2 { margin: 0; font: 15pt/1 Bungee, sans-serif; color: var(--yellow);
+            text-shadow: 0.5mm 0.5mm 0 var(--red), 1mm 1mm 0 var(--blue); }
+  .tag .el { margin: 1.6mm 0 0; font: 700 9pt Play, sans-serif; color: var(--orange); letter-spacing: 0.3mm; }
+  .tag p { margin: 1.2mm 0 0; font: italic 8.5pt Play, sans-serif; color: var(--pyellow); }
+  .foot { position: absolute; left: 0; right: 0; bottom: 0; height: 13mm; display: flex; align-items: center;
+          justify-content: space-between; padding: 0 3mm;
+          background: repeating-linear-gradient(-55deg, #000 0 3mm, #111 3mm 6mm); border-top: 0.6mm solid #fff; }
+  .label { font: 13pt Bungee, sans-serif; padding: 0.8mm 2.2mm 0.4mm; border: 0.6mm solid #fff; border-radius: 2mm;
+           background: linear-gradient(var(--blue), #000); }
+  .label span { background: linear-gradient(var(--yellow) 0 40%, var(--orange) 40% 65%, var(--red) 65%);
+                -webkit-background-clip: text; color: transparent; }
+  .k128 { text-align: right; font: 700 8pt/1.15 Play, sans-serif; }
+  .k128 b { display: block; font: 15pt/1 Bungee, sans-serif; color: var(--yellow); }
+  .burst { position: absolute; top: 76mm; right: 3mm; width: 25mm; height: 25mm; background: var(--yellow);
+           color: var(--red); display: flex; align-items: center; justify-content: center; text-align: center;
+           font: 7.5pt/1.05 Bungee, sans-serif; transform: rotate(12deg);
+           clip-path: polygon(50% 0, 61% 14%, 79% 7%, 80% 25%, 98% 28%, 88% 44%, 100% 58%, 83% 66%, 88% 84%,
+                              69% 82%, 61% 100%, 50% 87%, 37% 100%, 31% 82%, 12% 84%, 17% 66%, 0 58%, 12% 44%,
+                              2% 28%, 20% 25%, 21% 7%, 39% 14%); }
+
+  /* spine */
+  .spine { width: var(--spine); height: var(--h); background: linear-gradient(90deg, #000, var(--blue) 50%, #000);
+           display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+           padding: 3mm 0; border-left: 0.4mm solid #fff; border-right: 0.4mm solid #fff; }
+  .spine .cpc { font: 700 7pt Play, sans-serif; writing-mode: vertical-rl; color: var(--pyellow); }
+  .spine .title { writing-mode: vertical-rl; font: 15pt Bungee, sans-serif; letter-spacing: 0.4mm;
+                  color: var(--yellow); text-shadow: 0.4mm 0.4mm 0 var(--red); }
+  .spine .pub { writing-mode: vertical-rl; font: 7.5pt Bungee, sans-serif; color: #fff; }
+  .spine .bars { width: 9mm; height: 6mm; background: linear-gradient(var(--red) 0 33%, var(--green) 33% 66%, var(--bblue) 66%); }
+
+  /* back */
+  .back { padding: 13.5mm 5mm 0; }
+  .back .logo { display: block; width: 52mm; margin: 0 auto 1mm; image-rendering: pixelated; }
+  .back .blurb { font: 8.6pt/1.4 Play, sans-serif; color: #fff; margin: 0 0 2mm; text-align: justify; }
+  .back .blurb b { color: var(--yellow); }
+  .shots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.6mm; margin: 1mm 0 5mm; }
+  .shots img { width: 100%; image-rendering: pixelated; border: 0.6mm solid #fff; box-shadow: 0.6mm 0.6mm 0 var(--orange); }
+  .feat { columns: 2; column-gap: 4mm; margin: 0 0 5mm; padding: 0; list-style: none; font: 8pt/1.35 Play, sans-serif; }
+  .feat li { break-inside: avoid; padding-left: 3mm; position: relative; margin-bottom: 1.2mm; }
+  .feat li::before { content: "▶"; position: absolute; left: 0; color: var(--red); font-size: 6pt; top: 0.3mm; }
+  .load { display: flex; gap: 2mm; align-items: stretch; font: 7.8pt/1.3 Play, sans-serif; }
+  .load .box { flex: 1; border: 0.5mm solid var(--yellow); padding: 1.2mm 2mm; }
+  .load .box b { color: var(--yellow); font: 7.5pt Bungee, sans-serif; display: block; }
+  .load code { font: 700 8pt 'Courier New', monospace; color: var(--pyellow); }
+  .barcode { width: 20mm; background: #fff; padding: 1mm 1.2mm 0.6mm; color: #000; text-align: center;
+             font: 5.5pt monospace; }
+  .barcode div { height: 8mm; background: repeating-linear-gradient(90deg, #000 0 0.3mm, #fff 0.3mm 0.6mm,
+                 #000 0.6mm 1.2mm, #fff 1.2mm 1.5mm, #000 1.5mm 1.7mm, #fff 1.7mm 2.3mm); }
+  .copy { position: absolute; left: 0; right: 0; bottom: 0; height: 7mm; display: flex; align-items: center;
+          justify-content: center; font: 6.5pt Play, sans-serif; color: #aaa; border-top: 0.4mm solid #333; }
+  .copy b { color: #fff; margin: 0 1mm; }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <!-- BACK -->
+  <section class="panel back">
+    <div class="strip" style="position:absolute;top:0;left:0;right:0">
+      <span class="machine">COMMODORE <b>64</b></span><span class="badge">DISK</span>
+    </div>
+    <img class="logo" src="logo.png" alt="Runner A.P.E.R">
+    <p class="blurb">
+      <b>6:47 a.m., Kiato.</b> Uncle Babis, the finest souvlaki man in Piraeus, needs Grandma's secret spice before the
+      judge of the "Golden Skewer" arrives at noon. The train is cancelled (a goat on the line) and the only taxi
+      driver in town is Babis himself. So you run: <b>along the electric railway, from the city avenue to the pine
+      forest, all the way to Piraeus.</b> The ticket inspector is after you. So is the goat.
+    </p>
+    <div class="shots">
+      <img src="../screenshots/05_city.png" alt="">
+      <img src="../screenshots/06_forest.png" alt="">
+      <img src="../screenshots/07_power_up.png" alt="">
+      <img src="../screenshots/08_hard_countdown.png" alt="">
+    </div>
+    <ul class="feat">
+      <li>Smooth scroll at a steady 50 fps</li>
+      <li>Three tracks, trains, ramps, stops and signals</li>
+      <li>Run on the roofs: five heights of jumping</li>
+      <li>Turbo, magnet, super jump, helmet and more</li>
+      <li>Easy, medium and hard: jump the wagon gaps!</li>
+      <li>Original SID music and effects</li>
+      <li>High scores saved to disk</li>
+      <li>English and Greek</li>
+    </ul>
+    <div class="load">
+      <div class="box"><b>Loading</b>Insert the disk, type <code>LOAD"RUNNER",8</code> then
+        <code>RUN</code>. Joystick in port 2, or keyboard.</div>
+      <div class="barcode"><div></div>5 202026 000064</div>
+    </div>
+    <div class="copy">©<b>2026 REVIVE8BIT</b>· Programmed by <b>VASPER</b>· Made in Greece</div>
+  </section>
+
+  <!-- SPINE -->
+  <section class="spine">
+    <span class="cpc">COMMODORE 64</span>
+    <span class="title">RUNNER A.P.E.R</span>
+    <span class="pub">REVIVE8BIT</span>
+    <span class="bars"></span>
+  </section>
+
+  <!-- FRONT -->
+  <section class="panel front">
+    <div class="strip"><span class="machine">COMMODORE <b>64</b></span><span class="badge">DISK</span></div>
+    <img class="art" src="../../gfx/cover/art.jpg" alt="Runner A.P.E.R">
+    <div class="burst">SID<br>SOUND!</div>
+    <div class="tag">
+      <h2>THE LAST SOUVLAKI MAN</h2>
+      <div class="el">Ο ΤΕΛΕΥΤΑΙΟΣ ΣΟΥΒΛΑΤΖΗΣ</div>
+      <p>Jump the stops. Grab the coins. Beat the goat to Piraeus.</p>
+    </div>
+    <div class="foot">
+      <span class="label"><span>REVIVE8BIT</span></span>
+      <span class="k128"><b>RUNNER</b>ATHENS PIRAEUS<br>ELECTRIC RAILWAYS</span>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

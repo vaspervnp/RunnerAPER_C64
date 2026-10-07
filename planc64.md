@@ -570,7 +570,21 @@ manuals, ο αλγόριθμος του `random` (ίδιο seed `#ACE1`). Τα �
       το αποθετήριο του CPC συνεχίζει και το working tree του αλλάζει.
 
 ### Φάση 11 — Έκδοση
-- [ ] README, manuals EN/EL (από του CPC, προσαρμοσμένα: joystick port 2, πλήκτρα), `.d64`, εξώφυλλο.
+- [x] `README.md` (αγγλικά, όπως του CPC: χαρακτηριστικά, τι άλλαξε από το CPC, build, tests, δομή).
+- [x] Οδηγίες EN/EL (`docs/manual_*.md` → PDF): του CPC, προσαρμοσμένες: φόρτωση `LOAD"RUNNER",8` / `RUN` (~2 λεπτά
+      σε 1541), joystick θύρα 2, `RUN/STOP`, το HUD κάτω, χωρίς κινούμενα τρένα/αυτοκίνητα, μέρα-νύχτα, demo· φανάρια
+      πάντα κόκκινα. `tools/mkdocs64.py` (του CPC: Edge από WSL τυπώνει τα PDF).
+- [x] Screenshots (`tools/screenshots64.py`, `make screenshots`): 10 εικόνες από headless VICE (μενού EN/EL,
+      ιστορία, πλήκτρα, πόλη, δάσος, power-up με μαγνήτη, αντίστροφη μέτρηση HARD, game over, ρεκόρ) και το λογότυπο
+      όπως το ζωγραφίζει ο C64.
+- [x] Εξώφυλλο (`docs/cover/`): του CPC με «COMMODORE 64 · DISK», τα screenshots του C64, το εικαστικό του CPC
+      (`gfx/cover/art.jpg`)· `cover.pdf`, `cover.png`, `front.png`.
+- [x] `.d64` (`make`): `runner`, και το `SCORES` όταν μπει ρεκόρ.
+- Αλλαγές που έφεραν τα screenshots: το κείμενο `ESC : MENU` → `RUN/STOP : MENU`· τα ονόματα των power-ups/σταθμών
+  και η υπόδειξη του HARD γράφονται πλέον **στο HUD** για 2 s (σειρά της διαδρομής, `hud_message`) αντί για πάνω στη
+  γραμμή: οι στήλες των άκρων των γραμμών έχουν κόκκινο colour RAM (στοπ, φανάρια, φώτα μηχανών) και τα γράμματα εκεί
+  χάνονταν. Το 3-2-1-GO! μένει στη γραμμή (1–3 γράμματα στη μέση).
+- Ανοιχτό: cruncher (π.χ. exomizer) για γρηγορότερη φόρτωση· δοκιμή σε πραγματικό C64.
 
 ---
 

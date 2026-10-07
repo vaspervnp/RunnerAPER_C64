@@ -21,7 +21,7 @@ controls_right: → OR P : RIGHT
 controls_jump: ↑ Q SPACE : JUMP
 controls_down: ↓ OR A : DOWN
 controls_pause: H : PAUSE
-controls_esc: ESC : MENU
+controls_esc: RUN/STOP : MENU
 controls_music: M : MUSIC ON/OFF
 controls_joy: OR JOYSTICK
 controls_back: SPACE : BACK

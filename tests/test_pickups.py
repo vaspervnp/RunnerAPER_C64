@@ -9,7 +9,7 @@ out of the picture checks.
     picture (shown screen, frame after frame: both buffers in turn);
   - a jump flies over a coin;
   - power-ups: sprite 6 over their row, then the timer (the CPC's x 2), the
-    effect, the name on the track (scrolling with it);
+    effect, the name in the HUD for 2 s;
   - magnet: the coins of the lanes around the runner fly to it, no traces;
   - stations: the name, the next station, Piraeus +1000;
   - score: a point a row (2 with turbo);
@@ -29,6 +29,7 @@ import mktext64  # noqa: E402
 
 WORLD_RING = 0x0400
 SCREEN_A, SCREEN_B = 0x4000, 0x4400
+HUD_ROUTE_ROW = 22
 PF_ROWS = 21
 LANE_X = (9, 16, 23)
 COIN_COL = 3
@@ -171,16 +172,18 @@ class PickupTest(unittest.TestCase):
                                      f"row {n} lane {lane}: coin shown {shown}, item {d[D_ITEM + lane]}")
         return check
 
-    def label_check(self, t, text, row):
-        """the label written when world row `row` was at screen row LABEL_ROW"""
+    def message_check(self, t, text):
+        """the name in the HUD's route row, centred, on both screens"""
         codes = TEXTS["el" if t.vm.peek8("language") else "en"][text]
-        first = 9 + (22 - len(codes)) // 2
-        top, chars = t.shown()
-        r = top - row
-        self.assertTrue(0 <= r < PF_ROWS)
-        self.assertEqual(list(chars[r * 40 + first:r * 40 + first + len(codes)]), codes,
-                         f"{text} at screen row {r}")
-        return r
+        first = (40 - len(codes)) // 2
+        for screen in (SCREEN_A, SCREEN_B):
+            row = list(t.vm.peek(screen + HUD_ROUTE_ROW * 40, 40))
+            self.assertEqual(row[first:first + len(codes)], codes, f"{text} in the HUD")
+
+    def route_back(self, t):
+        hud_chars = t.vm.peek("hud_chars", 26)[21:26]
+        row = t.vm.peek(SCREEN_A + HUD_ROUTE_ROW * 40 + 1, 38)
+        self.assertTrue(all(c in hud_chars for c in row), "the route again")
 
     def test_coin_taken_and_erased(self):
         t = self.track()
@@ -223,13 +226,11 @@ class PickupTest(unittest.TestCase):
         self.assertGreater(seen, 10, "the power-up is shown on its way")
         self.assertIn(vm.peek16("pu_magnet"), (499, 500))
         self.assertFalse(vm.peek8("spr_ena") & 0x40, "taken: no sprite")
-        label_row = vm.peek16("disp_top") - LABEL_ROW
-        self.label_check(t, "pu_magnet", label_row)
-        rows_seen = set()
-        for _ in range(40):                      # it scrolls down with the world
-            t.frame()
-            rows_seen.add(self.label_check(t, "pu_magnet", label_row))
-        self.assertGreater(len(rows_seen), 5)
+        self.message_check(t, "pu_magnet")
+        t.frames(90)                             # 2 s, then the route again
+        self.message_check(t, "pu_magnet")
+        t.frames(12)
+        self.route_back(t)
         before = vm.peek16("pu_magnet")
         t.frames(10)
         self.assertEqual(vm.peek16("pu_magnet"), before - 10)
@@ -302,13 +303,13 @@ class PickupTest(unittest.TestCase):
         t.go()
         t.until(lambda: vm.peek8("station_next") == 2)
         self.assertEqual(vm.peek8("route_x"), 7, "the HUD's route: on the first station")
-        self.label_check(t, "station_1", vm.peek16("disp_top") - LABEL_ROW)
+        self.message_check(t, "station_1")
         vm.poke("station_next", 6)
         vm.poke("language", 1)
         extra = t.score() - t.distance()
         t.until(lambda: vm.peek8("station_next") == 1)
         self.assertEqual(vm.peek8("route_x"), 1, "after Piraeus: the route from the start")
-        self.label_check(t, "station_6", vm.peek16("disp_top") - LABEL_ROW)
+        self.message_check(t, "station_6")
         self.assertEqual(t.score() - t.distance() - extra, 1000)
 
     def test_score_a_point_a_row(self):

@@ -3,6 +3,8 @@
 #   make run    -> x64sc with autostart
 #   make test   -> headless tests (VICE binary monitor)
 #   make stutter -> 10 minutes of play x 3 skills x 3 seeds: frames lost, load
+#   make screenshots -> docs/screenshots/*.png (and the cover's logo)
+#   make docs   -> docs/manual_*.pdf, docs/cover/ (a Chromium browser: EDGE=)
 #   make shot   -> headless run, screenshot in build/shot.png
 #   make gfx    -> src/data/ (charset, tiles, sprites) from gfx/png
 #   make mockup -> build/mockup_*.png, game screens made from src/data
@@ -29,7 +31,7 @@ LIST    := $(BUILD)/runner.lst
 # -i NMOS 6510 (illegal opcodes allowed), -Wall all warnings
 TASSFLAGS := -C -a -B -i -Wall -I src
 
-.PHONY: all run test stutter shot clean gfx mockup
+.PHONY: all run test stutter shot screenshots docs clean gfx mockup
 
 all: $(D64)
 
@@ -65,6 +67,12 @@ test: $(D64)
 
 stutter: $(PRG)
 	$(PYTHON) tests/stutter.py 10 3
+
+screenshots: $(D64)
+	$(PYTHON) tools/screenshots64.py
+
+docs:
+	$(PYTHON) tools/mkdocs64.py
 
 shot: $(D64)
 	$(X64) -console -default -warp -silent -sounddev dummy -autostartprgmode 1 -autostart $(PRG) \

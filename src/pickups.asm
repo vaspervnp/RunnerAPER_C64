@@ -31,7 +31,8 @@ FLY_DX          = 24 - 4                ; sprite x - runner centre: the coin cen
 FLY_DY          = 14                    ; ... and on its chest
 PU_DY           = 14                    ; power-up sprite y = first line of its row - 14
 PU_Y_MAX        = $bc                   ; sprites stay above the split ($d3)
-LABEL_ROW       = 8                     ; screen row of the labels
+LABEL_ROW       = 8                     ; screen row of the countdown's labels
+MSG_FRAMES      = 100                   ; a name in the HUD: 2 s
 PU_TIMERS       = 6
 
 pickups_init
@@ -100,7 +101,8 @@ activate_powerup
         pha
         clc
         adc #TXT_PU_MAGNET - ITEM_MAGNET
-        jsr show_label
+        ldx #MSG_FRAMES                 ; its name in the HUD
+        jsr hud_message
         pla
         cmp #ITEM_HELMET
         bne _timed
@@ -501,13 +503,12 @@ stations
         pla
 +       clc
         adc #TXT_STATION_1-1
-        jmp show_label
+        ldx #MSG_FRAMES
+        jmp hud_message
 _ret    rts
 
-; A = text number: written centred on the track, in screen row LABEL_ROW
-; (show_label_at: row X)
-show_label
-        ldx #LABEL_ROW
+; A = text number, X = screen row: written there, centred on the track
+; (the countdown: the world stands still)
 show_label_at
         stx lb_row
         jsr text_addr                   ; ptr5, Y = length (screens.asm)
@@ -654,6 +655,7 @@ vis_row         .word ?                 ; its world row
 station_seen    .word ?
 station_next    .byte ?
 no_pickups      .byte ?                 ; test switch: no items, no labels
+msg_timer       .byte ?                 ; frames the HUD message stays (hud.asm)
 route_x         .byte ?                 ; HUD column of the runner on the route
 route_sub       .byte ?                 ; rows into that column
 hud_shown                               ; what the HUD shows ($ff: nothing yet)

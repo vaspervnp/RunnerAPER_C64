@@ -160,9 +160,9 @@ _counting
         stx count_first
         ldx gap_hard
         beq _numbers
-        lda #TXT_PU_WAGONS
-        ldx #LABEL_ROW
-        jsr show_label_at
+        lda #TXT_PU_WAGONS              ; in the HUD until GO!
+        ldx #HINT_FRAMES + COUNT_STEP*3 + COUNT_STEP/2
+        jsr hud_message
 _numbers
         lda countdown
         ldx #TXT_PU_3                   ; 3, 2, 1 with 120, 80, 40 frames left
@@ -206,33 +206,11 @@ _playing
 pause_label
         lda paused
         bne +
-        jmp hud_route                   ; the route back
-+       ldx #39                         ; the route row blank
-        lda #FONT_SPACE
--       sta HUD_A+40,x
-        sta HUD_B+40,x
-        dex
-        bpl -
-        lda #TXT_PAUSE
-        jsr text_addr
-        sty t8
-        tya                             ; centred
-        eor #$ff
-        sec
-        adc #40
-        lsr a
-        tax
-        ldy #0
--       lda (ptr5),y
-        sta HUD_A+40,x
-        sta HUD_B+40,x
-        lda #8 | WHITE
-        sta HUD_CRAM+40,x
-        inx
-        iny
-        cpy t8
-        bne -
-        rts
+        lda #0                          ; the route back (a message is over)
+        sta msg_timer
+        jmp hud_route
++       lda #TXT_PAUSE
+        jmp hud_text_row
 
 ; -----------------------------------------------------------------------------
 ; key_l / key_m: NZ if the key went down since the last call (matrix edges)

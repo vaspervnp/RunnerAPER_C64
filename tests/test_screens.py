@@ -187,7 +187,9 @@ class FlowTest(FlowSteps, unittest.TestCase):
         f = self.flow()
         self.start(f, skill=2)
         f.frames(3)
-        self.assertShows(f, LABEL_ROW, "pu_wagons")
+        hud = list(f.vm.peek(HUD_ROUTE, 40))
+        hint = f.text("pu_wagons")
+        self.assertTrue(any(hud[x:x + len(hint)] == hint for x in range(40)), "the hint in the HUD")
         self.assertEqual(f.vm.peek8("gap_hard"), 1)
         self.assertEqual((f.vm.peek8("speed_hi"), f.vm.peek8("speed_lo")), (2, 0x80), "hard: 2.5")
 

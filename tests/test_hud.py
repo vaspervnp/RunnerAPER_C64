@@ -67,7 +67,7 @@ class HudTest(unittest.TestCase):
         self.assertEqual(h.number(a, COINS_X, 4), bcd(vm.peek("coins", 2)))
         self.assertEqual(h.number(a, LIVES_X, 1), vm.peek8("lives"))
         here = vm.peek8("route_x")
-        for x in range(ROUTE_FIRST, ROUTE_LAST + 1):
+        for x in range(ROUTE_FIRST, ROUTE_LAST + 1) if not vm.peek8("msg_timer") else ():
             if x == here:
                 want = HC_HERE
             elif x == ROUTE_FIRST:
