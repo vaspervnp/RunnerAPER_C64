@@ -95,6 +95,8 @@ _ret    rts
 
 ; A = item 2..7
 activate_powerup
+        ldx #SFX_POWERUP
+        stx sfx_request
         pha
         clc
         adc #TXT_PU_MAGNET - ITEM_MAGNET
@@ -227,6 +229,8 @@ _done   cld
 
 ; a coin: +1 coin (BCD, saturates at 9999), +10 points (+20 with the ticket)
 collect_coin
+        lda #SFX_COIN
+        sta sfx_request
         php
         sei
         sed
@@ -478,6 +482,8 @@ stations
         lda (dp),y
         and #F_STATION
         beq _ret
+        lda #SFX_SIGNAL                 ; the bell
+        sta sfx_request
         lda station_next                ; 1 Corinth .. 6 Piraeus
         tax
         inx

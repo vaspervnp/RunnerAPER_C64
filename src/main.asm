@@ -11,6 +11,7 @@ PSTATE          = $c100                 ; the runner (player.asm)
 KSTATE          = $c200                 ; coins, power-ups, score (pickups.asm)
 MSTATE          = $c300                 ; menus, high scores (screens.asm)
 MENU_CHARSET    = $6000                 ; font + logo (tools/mklogo64.py)
+SSTATE          = $c400                 ; the sound player (sound.asm)
 
 ; text: our font's codes (assets64.FONT_GLYPHS: space, a-z, 0-9, ...)
         .enc "game"
@@ -53,6 +54,7 @@ start
         bne -
 
         jsr flow_init           ; high scores (from the disk), menu state
+        jsr sound_init
         jsr game_start          ; a world behind the menu, the HUD
         jsr go_menu
         jmp main_loop
@@ -273,6 +275,7 @@ irq_split
         lda #IRQ_LINE
         sta VIC_RASTER
 irq_split_end
+        jsr sound_tick          ; 50 times a second, after the HUD is set
         jmp $ea81
 
         .include "video.asm"
@@ -283,6 +286,7 @@ irq_split_end
         .include "hud.asm"
         .include "screens.asm"
         .include "disk.asm"
+        .include "sound.asm"
 code_end
 
         .cerror code_end > $4000, "code runs into the VIC bank"
@@ -305,5 +309,6 @@ sprite_blank                    ; an empty block (player.asm: cut under decks)
         .include "data/gfx.asm"
         .include "data/text.asm"
         .include "data/logo.asm"
+        .include "data/music.asm"
 data_end
         .cerror data_end > WSTATE, "data runs into the generator state"

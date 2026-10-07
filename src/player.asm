@@ -103,6 +103,8 @@ _jump   lda arc_len
         beq +
         ldx #ARC_SPRING
 +       stx arc_ofs
+        lda #SFX_JUMP
+        sta sfx_request
         lda arcs,x
         asl a                           ; 2 frames a step
         sta arc_len
@@ -301,6 +303,8 @@ _crash_feet
 crash
         lda no_crash                    ; test switch
         bne _ret
+        lda #SFX_CRASH                  ; (also when the helmet takes it)
+        sta sfx_request
         lda helmet                      ; the helmet takes this one
         beq +
         lda #0

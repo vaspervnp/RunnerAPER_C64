@@ -71,5 +71,7 @@ game_mode       = $52           ; screens.asm: MODE_*
 music_on        = $53
 sound_on        = $54
 lb_row          = $55           ; show_label_at
+snd_ptr         = $56           ; sound.asm (IRQ only)
+sfx_request     = $58           ; an effect to play (SFX_*), 0: none
 
 ZP_END          = $90

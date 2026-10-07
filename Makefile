@@ -16,8 +16,8 @@ PYTHON  ?= python3
 BUILD   := build
 SRC     := $(wildcard src/*.asm src/*.inc)
 GFX_IN  := $(wildcard gfx/png/*.png gfx/png/*.json)
-GFX_TOOLS := tools/c64palette.py tools/assets64.py tools/png2c64.py tools/mklevel64.py tools/mktext64.py tools/mklogo64.py
-GFX_IN  += $(wildcard levels/chunks/*.txt text/*.txt)
+GFX_TOOLS := tools/c64palette.py tools/assets64.py tools/png2c64.py tools/mklevel64.py tools/mktext64.py tools/mklogo64.py tools/mkmusic64.py
+GFX_IN  += $(wildcard levels/chunks/*.txt text/*.txt music/*.txt)
 GFX_STAMP := src/data/.stamp
 PRG     := $(BUILD)/runner.prg
 D64     := $(BUILD)/runner.d64
@@ -42,6 +42,7 @@ $(GFX_STAMP): $(GFX_IN) $(GFX_TOOLS)
 	$(PYTHON) tools/mklevel64.py
 	$(PYTHON) tools/mktext64.py
 	$(PYTHON) tools/mklogo64.py
+	$(PYTHON) tools/mkmusic64.py
 	touch $@
 
 mockup: $(GFX_STAMP)
