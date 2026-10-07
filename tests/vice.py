@@ -72,24 +72,33 @@ class Vice:
     def __init__(self, image=PRG, extra_args=(), boot_timeout=30.0, play=True):
         """play: past the menu at once, a game running (restart: no countdown)."""
         self.labels = load_labels()
-        self.port = free_port()
-        args = [X64, "-console", "-default", "-warp", "-silent", "-sounddev", "dummy",
-                "-binarymonitor", "-binarymonitoraddress", f"ip4://127.0.0.1:{self.port}",
-                "-autostartprgmode", "1", *extra_args, "-autostart", image]
-        self.proc = subprocess.Popen(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         self.sock = None
         self._req = 0
         self._pending = []          # events read while waiting for a response
-        deadline = time.time() + boot_timeout
-        while True:
-            try:
-                self.sock = socket.create_connection(("127.0.0.1", self.port), timeout=boot_timeout)
+        # a free port may be taken by another VICE starting at the same time:
+        # if this one exits before the monitor answers, again with another port
+        for attempt in range(5):
+            self.port = free_port()
+            args = [X64, "-console", "-default", "-warp", "-silent", "-sounddev", "dummy",
+                    "-binarymonitor", "-binarymonitoraddress", f"ip4://127.0.0.1:{self.port}",
+                    "-autostartprgmode", "1", *os.environ.get("VICE_ARGS", "").split(), *extra_args,
+                    "-autostart", image]
+            self.proc = subprocess.Popen(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            deadline = time.time() + boot_timeout
+            while self.sock is None:
+                try:
+                    self.sock = socket.create_connection(("127.0.0.1", self.port), timeout=boot_timeout)
+                except OSError:
+                    if self.proc.poll() is not None or time.time() > deadline:
+                        break
+                    time.sleep(0.05)
+            if self.sock is not None:
                 break
-            except OSError:
-                if time.time() > deadline or self.proc.poll() is not None:
-                    self.close()
-                    raise MonitorError("could not connect to the VICE binary monitor")
-                time.sleep(0.05)
+            if self.proc.poll() is None:
+                self.proc.kill()
+            self.proc.wait()
+        if self.sock is None:
+            raise MonitorError("could not connect to the VICE binary monitor")
         self._banks = None
         self._regs = None
         if play:

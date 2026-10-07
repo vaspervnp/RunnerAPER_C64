@@ -7,16 +7,43 @@ platforms and the sides' ground - row for row. (Easy: the CPC moves no
 trains there either; its moving cars are switched off, see setUpClass.
 The C64 tests compare the C64 with the model.)
 
-Skipped when the CPC repository, its build or the emulator are missing.
+The CPC is the commit CPC_COMMIT of ../APERRunner (or CPC_ROOT, a built
+copy). Skipped when the CPC repository, its build or the emulator are
+missing.
 """
 
 import os
+import shutil
+import subprocess
 import sys
 import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
-CPC_ROOT = os.environ.get("CPC_ROOT", os.path.join(os.path.dirname(ROOT), "APERRunner"))
+# The CPC version the C64's world is a port of: its repository goes on (and
+# its working tree changes), so the comparison is with this commit, taken
+# out with git archive (the repository is only read) and built in build/.
+CPC_REPO = os.path.join(os.path.dirname(ROOT), "APERRunner")
+CPC_COMMIT = "1175278"
+
+
+def pinned_cpc():
+    """build/cpc-<commit>, extracted and built once; None if that fails"""
+    out = os.path.join(ROOT, "build", f"cpc-{CPC_COMMIT}")
+    if os.path.exists(os.path.join(out, "build", "runner.dsk")):
+        return out
+    try:
+        shutil.rmtree(out, ignore_errors=True)
+        os.makedirs(out)
+        archive = subprocess.run(["git", "-C", CPC_REPO, "archive", CPC_COMMIT], capture_output=True, check=True)
+        subprocess.run(["tar", "-x", "-C", out], input=archive.stdout, check=True)
+        subprocess.run(["make"], cwd=out, capture_output=True, check=True, timeout=600)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return out
+
+
+CPC_ROOT = os.environ.get("CPC_ROOT") or pinned_cpc() or CPC_REPO
 CPC_TESTS = os.path.join(CPC_ROOT, "tools", "tests")
 CPC_DSK = os.path.join(CPC_ROOT, "build", "runner.dsk")
 CPCEMU = os.environ.get("CPCEMU", os.path.expanduser("~/cpcemu"))

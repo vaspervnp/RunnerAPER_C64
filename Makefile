@@ -2,6 +2,7 @@
 #   make        -> build/runner.d64
 #   make run    -> x64sc with autostart
 #   make test   -> headless tests (VICE binary monitor)
+#   make stutter -> 10 minutes of play x 3 skills x 3 seeds: frames lost, load
 #   make shot   -> headless run, screenshot in build/shot.png
 #   make gfx    -> src/data/ (charset, tiles, sprites) from gfx/png
 #   make mockup -> build/mockup_*.png, game screens made from src/data
@@ -28,7 +29,7 @@ LIST    := $(BUILD)/runner.lst
 # -i NMOS 6510 (illegal opcodes allowed), -Wall all warnings
 TASSFLAGS := -C -a -B -i -Wall -I src
 
-.PHONY: all run test shot clean gfx mockup
+.PHONY: all run test stutter shot clean gfx mockup
 
 all: $(D64)
 
@@ -61,6 +62,9 @@ run: $(D64)
 
 test: $(D64)
 	$(PYTHON) tests/run_tests.py
+
+stutter: $(PRG)
+	$(PYTHON) tests/stutter.py 10 3
 
 shot: $(D64)
 	$(X64) -console -default -warp -silent -sounddev dummy -autostartprgmode 1 -autostart $(PRG) \
