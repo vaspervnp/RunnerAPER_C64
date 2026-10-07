@@ -227,12 +227,26 @@ def stop(part):
 
 
 def signal(part):
+    """A signal gantry across its lane (2 rows: part 0 the upper one): a big
+    red lamp at each edge of the lane (the edge columns are the only red
+    ones) and two light grey beams between them. The C64's signals are
+    always red."""
+    red = colour("red")
     base = rail(1)
-    if part == 0:                            # head: lit red lamp over a dark one
-        over(base, art(["lll ", "lrl ", "lrl ", "lll ", "l.l ", "l.l ", "lll ", " m  "]), 0, 0)
+    if part == 0:
+        for x0 in (0, 24):                   # lamps: hood, then lit
+            hline(base, x0, x0 + 3, 0, MC2)
+            for y in range(1, 8):
+                hline(base, x0, x0 + 3, y, red)
+        hline(base, 4, 23, 2, MC1)           # the upper beam
+        hline(base, 4, 23, 3, MC1)
         return base
-    vline(base, 1, 0, 7, MC2)                # post, with its foot
-    hline(base, 0, 2, 6, MC2)
+    for x0 in (0, 24):                       # lamps' lower half, their foot
+        for y in range(0, 5):
+            hline(base, x0, x0 + 3, y, red)
+        hline(base, x0, x0 + 3, 5, MC2)
+    hline(base, 4, 23, 2, MC1)               # the lower beam
+    hline(base, 4, 23, 3, MC1)
     return base
 
 
