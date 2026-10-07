@@ -18,12 +18,13 @@ sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(ROOT, "tests"))
 
 import c64palette  # noqa: E402
-from test_pickups import COIN, MAGNET, TURBO, Track  # noqa: E402
+from test_pickups import COIN, D_COLL, MAGNET, TURBO, Track  # noqa: E402
 from test_screens import KEY_DOWN, KEY_FIRE, KEY_UP, Flow  # noqa: E402
 from vice import Vice  # noqa: E402
 
 OUT = os.path.join(ROOT, "docs", "screenshots")
 F_FOREST = 0x01
+COL_SIGNAL = 2
 
 
 def grab(vm, name, track=None):
@@ -122,6 +123,25 @@ def city_and_forest():
         vm.close()
 
 
+def signal():
+    """a signal on the runner's track (the middle one), a little ahead"""
+    vm = Vice()
+    try:
+        vm.run_frames(2)
+        for name, value in (("test_mode", 1), ("test_keys", 0), ("no_crash", 1), ("speed_hi", 2)):
+            vm.poke(name, value)
+        for _ in range(5000):
+            vm.run_frames(2)
+            top = vm.peek16("disp_top")
+            ring = vm.peek(0x0400, 64 * 16)
+            if any(ring[((top - r) & 63) * 16 + D_COLL + 1] == COL_SIGNAL for r in (8, 9)):
+                break
+        vm.poke("speed_hi", 0)
+        grab(vm, "11_signal.png")
+    finally:
+        vm.close()
+
+
 def power_up():
     t = Track()
     vm = t.vm
@@ -146,6 +166,7 @@ def main():
     os.makedirs(OUT, exist_ok=True)
     screens()
     city_and_forest()
+    signal()
     power_up()
 
 

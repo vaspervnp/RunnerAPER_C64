@@ -575,8 +575,8 @@ manuals, ο αλγόριθμος του `random` (ίδιο seed `#ACE1`). Τα �
 - [x] Οδηγίες EN/EL (`docs/manual_*.md` → PDF): του CPC, προσαρμοσμένες: φόρτωση `LOAD"RUNNER",8` / `RUN` (~2 λεπτά
       σε 1541), joystick θύρα 2, `RUN/STOP`, το HUD κάτω, χωρίς κινούμενα τρένα/αυτοκίνητα, μέρα-νύχτα, demo· φανάρια
       πάντα κόκκινα. `tools/mkdocs64.py` (του CPC: Edge από WSL τυπώνει τα PDF).
-- [x] Screenshots (`tools/screenshots64.py`, `make screenshots`): 10 εικόνες από headless VICE (μενού EN/EL,
-      ιστορία, πλήκτρα, πόλη, δάσος, power-up με μαγνήτη, αντίστροφη μέτρηση HARD, game over, ρεκόρ) και το λογότυπο
+- [x] Screenshots (`tools/screenshots64.py`, `make screenshots`): 11 εικόνες από headless VICE (μενού EN/EL,
+      ιστορία, πλήκτρα, πόλη, δάσος, power-up με μαγνήτη, φανάρι, αντίστροφη μέτρηση HARD, game over, ρεκόρ) και το λογότυπο
       όπως το ζωγραφίζει ο C64.
 - [x] Εξώφυλλο (`docs/cover/`): του CPC με «COMMODORE 64 · DISK», τα screenshots του C64, το εικαστικό του CPC
       (`gfx/cover/art.jpg`)· `cover.pdf`, `cover.png`, `front.png`.

@@ -174,6 +174,10 @@ TURBO and SLOW cancel each other.
 | Buffer stop | Jump it or change lane |
 | Signal | Always red: change lane, or jump it from a train roof (or with the SUPER JUMP) |
 
+![A signal on your track](screenshots/11_signal.png)
+
+A signal is a gate across the whole width of its track, with a red lamp at each side.
+
 ---
 
 ## Scoring and high scores
