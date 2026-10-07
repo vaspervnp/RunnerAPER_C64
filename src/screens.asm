@@ -118,10 +118,11 @@ start_game
         lda #1
         sta count_first
         rts
-; pixels a frame: 2.1, 2.8, 3.5 (the C64 shows 145 lines ahead of the feet:
-; an obstacle is in sight 1.38 / 1.04 / 0.83 s before it is reached)
-skill_speeds    .byte 2, 2, 3
-skill_speeds_lo .byte $1a, $cd, $80
+; pixels a frame: 2.1, 2.8, 2.8 (hard: as medium, its gaps between wagons
+; make it harder; the C64 shows 145 lines ahead of the feet: an obstacle is
+; in sight 1.38 / 1.04 s before it is reached)
+skill_speeds    .byte 2, 2, 2
+skill_speeds_lo .byte $1a, $cd, $cd
 
 ; game_state_update: the game-over wait is over
 game_finished

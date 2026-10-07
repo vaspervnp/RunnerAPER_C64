@@ -45,7 +45,7 @@ The C64 has 256 characters, colour RAM in 4×8 cells and 8 sprites, so a few thi
 - The HUD is a strip at the bottom instead of a panel on the right (a side panel would shake with the scroll).
 - Colours are fixed per screen column; the trains come in two liveries instead of three.
 - The trains and cars do not move; the signals are always red; there is no day and night cycle and no demo.
-- Speeds: 2.1 / 2.8 / 3.5 pixels a frame (EASY / MEDIUM / HARD), turbo + 1.4 up to 4.0 (the most the double
+- Speeds: 2.1 / 2.8 / 2.8 pixels a frame (EASY / MEDIUM / HARD), turbo + 1.4 up to 4.0 (the most the double
   buffer allows); the playfield shows 145 lines of the line ahead.
 - The wagons are 50 % longer (18 rows instead of 12), so there is time for the next jump on the roofs; the chunks
   are the CPC's, stretched when they are compiled.

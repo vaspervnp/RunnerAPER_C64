@@ -104,7 +104,7 @@ tracks get.
 |---|---|---|
 | EASY | gentle | Obstacles get denser slowly, never more than 2 on one track in a screen |
 | MEDIUM | a third faster | Obstacles get denser faster |
-| HARD | faster still | You must **jump the gaps between wagons** when you run on the roofs |
+| HARD | as MEDIUM | You must **jump the gaps between wagons** when you run on the roofs |
 
 ### Heights
 
