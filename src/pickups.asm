@@ -20,8 +20,8 @@
 ; (20 with the ticket); Piraeus 1000. Timers: the CPC's x 2 (50 Hz).
 ; =============================================================================
 
-TURBO_EXTRA     = $0100                 ; turbo: + 1.0 pixel a frame ...
-TURBO_MAX       = $0380                 ; ... up to 3.5 (the CPC's 2 and 7 lines)
+TURBO_EXTRA     = $0166                 ; turbo: + 1.4 pixels a frame ...
+TURBO_MAX       = $0400                 ; ... up to 4.0 (the double buffer: 2 frames a row)
 COIN_POINTS     = $10                   ; BCD
 MAGNET_LINE     = FOOT_Y - 72           ; coins take off here (the CPC's 176)
 FLYERS          = 3                     ; sprites 3-5
@@ -163,26 +163,33 @@ _not_slow
         lda pu_turbo
         ora pu_turbo+1
         beq _ret
-        lda speed_hi                    ; turbo: + 1.0, at most 3.5 (or the
-        cmp #>TURBO_MAX                 ; speed itself if it is higher)
-        bcs _high
-        cmp #>TURBO_MAX-1
-        bcc _add
-        lda speed_lo
+        lda speed_lo                    ; turbo: + TURBO_EXTRA ...
+        clc
+        adc #<TURBO_EXTRA
+        sta eff_lo
+        lda speed_hi
+        adc #>TURBO_EXTRA
+        sta eff_hi
+        lda #<TURBO_MAX                 ; ... at most TURBO_MAX
+        cmp eff_lo
+        lda #>TURBO_MAX
+        sbc eff_hi
+        bcs _ret
+        lda speed_lo                    ; (or the speed itself if it is higher)
         cmp #<TURBO_MAX
-        bcc _add
-_max    lda #<TURBO_MAX
+        lda speed_hi
+        sbc #>TURBO_MAX
+        bcs _base
+        lda #<TURBO_MAX
         sta eff_lo
         lda #>TURBO_MAX
         sta eff_hi
         rts
-_high   bne _ret
-        lda speed_lo
-        cmp #<TURBO_MAX
-        bcc _max
+_base   lda speed_lo
+        sta eff_lo
+        lda speed_hi
+        sta eff_hi
 _ret    rts
-_add    inc eff_hi
-        rts
 
 ; -----------------------------------------------------------------------------
 ; score_row: the world moved one row (video.asm, coarse step)

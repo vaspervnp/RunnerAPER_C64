@@ -118,12 +118,10 @@ start_game
         lda #1
         sta count_first
         rts
-; pixels a frame: 1.5, 2.0, 2.5. The CPC's 4, 5, 6 lines a game frame would
-; be 2.0, 2.5, 3.0, but the C64 shows 145 lines ahead of the feet, the CPC
-; 248: the time to see an obstacle coming is 1.9 / 1.45 / 1.16 s this way
-; (the CPC's: 2.5 / 2.0 / 1.65 s).
-skill_speeds    .byte 1, 2, 2
-skill_speeds_lo .byte $80, $00, $80
+; pixels a frame: 2.1, 2.8, 3.5 (the C64 shows 145 lines ahead of the feet:
+; an obstacle is in sight 1.38 / 1.04 / 0.83 s before it is reached)
+skill_speeds    .byte 2, 2, 3
+skill_speeds_lo .byte $1a, $cd, $80
 
 ; game_state_update: the game-over wait is over
 game_finished

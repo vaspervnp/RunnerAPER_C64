@@ -181,7 +181,7 @@ class FlowTest(FlowSteps, unittest.TestCase):
         self.assertShows(f, COUNT_ROW, "pu_go")
         f.frames(20)
         self.assertGreater(vm.peek16("disp_top"), top, "then it runs")
-        self.assertEqual((vm.peek8("speed_hi"), vm.peek8("speed_lo")), (1, 0x80), "easy: 1.5")
+        self.assertEqual((vm.peek8("speed_hi"), vm.peek8("speed_lo")), (2, 0x1A), "easy: 2.1")
 
     def test_hard_shows_the_wagons_hint(self):
         f = self.flow()
@@ -191,7 +191,7 @@ class FlowTest(FlowSteps, unittest.TestCase):
         hint = f.text("pu_wagons")
         self.assertTrue(any(hud[x:x + len(hint)] == hint for x in range(40)), "the hint in the HUD")
         self.assertEqual(f.vm.peek8("gap_hard"), 1)
-        self.assertEqual((f.vm.peek8("speed_hi"), f.vm.peek8("speed_lo")), (2, 0x80), "hard: 2.5")
+        self.assertEqual((f.vm.peek8("speed_hi"), f.vm.peek8("speed_lo")), (3, 0x80), "hard: 3.5")
 
     def test_pause_and_run_stop(self):
         f = self.flow()

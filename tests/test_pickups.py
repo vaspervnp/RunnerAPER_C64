@@ -278,7 +278,7 @@ class PickupTest(unittest.TestCase):
             self.assertIn(vm.peek16(TIMERS[kind]), (DURATIONS[kind] - 1, DURATIONS[kind]), TIMERS[kind])
             speed = vm.peek8("eff_hi") * 256 + vm.peek8("eff_lo")
             if kind == TURBO:
-                self.assertEqual(speed, 0x300, "turbo: 2.0 + 1.0")
+                self.assertEqual(speed, 0x366, "turbo: 2.0 + 1.4")
                 t.frames(8)
                 self.assertGreater(t.score() - t.distance(), 0, "turbo: 2 points a row")
             if kind == SLOW:
@@ -297,6 +297,18 @@ class PickupTest(unittest.TestCase):
         self.assertEqual(t.coins(), 1)
         self.assertGreaterEqual(t.score() - coins_score, 20, "ticket: 20 a coin")
         self.assertLess(t.score() - coins_score, 30)
+
+    def test_turbo_capped(self):
+        """turbo: + 1.4, at most 4.0 (the double buffer), never slower than the speed"""
+        t = self.track()
+        vm = t.vm
+        vm.poke("pu_turbo", (300).to_bytes(2, "little"))
+        for base, want in ((0x21A, 0x380), (0x380, 0x400), (0x400, 0x400), (0x480, 0x480)):
+            vm.poke("speed_lo", base & 255)
+            vm.poke("speed_hi", base >> 8)
+            t.frame()
+            self.assertEqual(vm.peek8("eff_hi") * 256 + vm.peek8("eff_lo"), want, f"turbo at ${base:04x}")
+        vm.poke("speed_hi", 0)
 
     def test_magnet(self):
         t = self.track()
