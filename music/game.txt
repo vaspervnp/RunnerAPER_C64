@@ -1,8 +1,47 @@
-# Game tune: fast, A hijaz (A Bb C# D E F G#). Original.
+# Game tune: fast, A hijaz (A Bb C# D E F G). Written for the SID.
 # tune: game
 # quarter: 16
 # loop: yes
-A: A4/8 Bb4/8 C#5/8 D5/8 E5/4 E5/4 | F5/8 E5/8 D5/8 C#5/8 D5/4 r/4 | E5/8 D5/8 C#5/8 Bb4/8 C#5/4 A4/4 | Bb4/8 A4/8 G#4/8 Bb4/8 A4/2
-A: A5/8 G#5/8 F5/8 E5/8 F5/4 E5/4 | D5/8 E5/8 F5/8 G#5/8 A5/4 r/4 | G#5/8 F5/8 E5/8 D5/8 C#5/8 D5/8 E5/8 C#5/8 | D5/8 C#5/8 Bb4/8 C#5/8 A4/2
-B: A2/4 E3/4 A2/4 E3/4 | D3/4 A2/4 D3/4 A2/4 | A2/4 E3/4 A2/4 E3/4 | Bb2/4 F3/4 A2/4 E3/4
-B: D3/4 A2/4 D3/4 A2/4 | E3/4 B2/4 E3/4 G#2/4 | A2/4 E3/4 A2/4 E3/4 | Bb2/4 F3/4 A2/4 E3/4
+#
+# Form: intro (2 bars), A (8), A' (8), B (8, the saw), break (4, bouzouki
+# runs over hats), then back to A. Chords, bar by bar:
+#   A, A':  A  Bb  A  Gm|A  A  Bb  Gm  A
+#   B:      Dm Gm  A  A     Dm Gm  Bb  A
+#   break:  A  A   Bb A
+
+# --- melody (voice 1) ---
+pat rest2: r/1 r/1
+pat p1: @lead E5/8 E5/16 F5/16 E5/8 D5/8 C#5/8 D5/8 E5/4 | F5/8 F5/16 G5/16 F5/8 E5/8 D5/8 C#5/8 Bb4/4 |
+        C#5/8 D5/8 E5/8 A5/8 G5/8 F5/8 E5/8 D5/8 | Bb4/8 D5/8 G5/8 F5/8 E5/8 D5/8 C#5/8 Bb4/8
+pat p2: @lead A4/8 C#5/8 E5/8 A5/8 A5/4 G5/8 F5/8 | G5/8 F5/8 E5/8 F5/8 D5/4 Bb4/4 |
+        G4/8 Bb4/8 D5/8 G5/8 F5/8 E5/8 D5/8 Bb4/8 | C#5/8 Bb4/8 C#5/8 D5/8 A4/2
+pat p3: @lead A5/8 G5/8 F5/8 E5/8 F5/8 E5/8 D5/8 C#5/8 | D5/8 F5/8 Bb5/8 A5/8 G5/8 F5/8 E5/8 D5/8 |
+        G5/8. F5/16 E5/8 D5/8 Bb4/8 C#5/8 D5/8 E5/8 | A5/4 E5/8 C#5/8 A4/2
+pat pb: @lead2 D5/4. E5/8 F5/4 A5/4 | G5/4. F5/8 E5/8 F5/8 G5/4 | A5/4 Bb5/8 A5/8 G5/8 F5/8 E5/4 |
+        C#5/2 r/4 E5/8 F5/8 | D5/4. E5/8 F5/4 A5/4 | Bb5/4. A5/8 G5/8 A5/8 Bb5/4 |
+        D6/8 F6/8 D6/8 Bb5/8 F5/8 G5/8 Bb5/8 A5/8 | G#5/8 A5/8 Bb5/8 G#5/8 A5/2
+pat pk: @bzk A4/16 Bb4/16 C#5/16 D5/16 E5/16 F5/16 G5/16 A5/16 Bb5/8 A5/8 G5/8 F5/8 |
+        E5/16 F5/16 E5/16 D5/16 C#5/16 D5/16 C#5/16 Bb4/16 A4/4 r/4 |
+        D5/16 E5/16 F5/16 G5/16 F5/16 E5/16 D5/16 C#5/16 D5/8 F5/8 Bb5/4 |
+        A5/16 G5/16 F5/16 E5/16 F5/16 E5/16 D5/16 C#5/16 Bb4/16 C#5/16 Bb4/16 A4/16 G#4/8 A4/8
+
+# --- bass (voice 2): half a bar, root and octave, in A (transposed) ---
+pat bh:  @bass A1/8 A2/8 A1/8 A2/8
+pat bh5: @bass A1/8 A2/8 E2/8 A2/8
+seq bA:  bh bh5
+seq bsA: bA bA+1 bA bh-2 bh5 bA bA+1 bA-2 bA
+seq bsB: bA+5 bA-2 bA bA bA+5 bA-2 bA+1 bA
+
+# --- drums and chords (voice 3): half a bar; the chord on A3 (transposed) ---
+pat dM:  @kick C3/8 @arpM A3/8 @snare C3/8 @arpM A3/8
+pat dM2: @kick C3/8 @kick C3/8 @snare C3/8 @arpM A3/8
+pat dm:  @kick C3/8 @arpm A3/8 @snare C3/8 @arpm A3/8
+pat dm2: @kick C3/8 @kick C3/8 @snare C3/8 @arpm A3/8
+pat dH:  @kick C3/8 @hat C3/8 @snare C3/8 @hat C3/8
+pat dF:  @kick C3/8 @snare C3/16 C3/16 C3/8 C3/16 C3/16
+seq dsA: dM dM2 dM+1 dM2+1 dM dM2 dm-2 dM2 dM dM2 dM+1 dM2+1 dm-2 dm2-2 dM dF
+seq dsB: dm+5 dm2+5 dm-2 dm2-2 dM dM2 dM dF dm+5 dm2+5 dm-2 dm2-2 dM+1 dM2+1 dM dF
+
+v1: rest2 > p1 p2 p1 p3 pb pk
+v2: bA bA > bsA bsA bsB bA bA bA+1 bA
+v3: dH dH dH dF > dsA dsA dsB dH*7 dF

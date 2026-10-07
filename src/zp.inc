@@ -73,5 +73,6 @@ sound_on        = $54
 lb_row          = $55           ; show_label_at
 snd_ptr         = $56           ; sound.asm (IRQ only)
 sfx_request     = $58           ; an effect to play (SFX_*), 0: none
+ord_ptr         = $59           ; word: sound.asm, a channel's order list (IRQ only)
 
 ZP_END          = $90

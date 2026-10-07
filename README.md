@@ -33,7 +33,9 @@ from the ramps and keep away from the red signals, from the city avenue all the 
   a bridge deck he is cut line by line.
 - **Power-ups**: turbo, slow, magnet (coins fly to you as sprites), super jump, helmet, 2x coins.
 - **3 difficulty levels**; on HARD you also jump the gaps between wagons.
-- **SID music and effects**: the CPC's three tunes and five effects on the SID.
+- **SID music**, written for the C64 in the CPC's style (A hijaz, D minor): a fast game tune with drums, bass
+  through the filter, chord arpeggios and bouzouki runs, a calm menu tune and a game over jingle. Instruments with
+  wavetables, pulse sweeps and vibrato; the five sound effects (the CPC's) take voice 3 while they play.
 - **Menus** with the logo, story, controls, countdown, pause, game over with name entry, **8 high scores saved to
   disk** (file `SCORES`), **English and Greek** (`L`).
 - Joystick in port 2 or keyboard.
@@ -49,6 +51,7 @@ The C64 has 256 characters, colour RAM in 4×8 cells and 8 sprites, so a few thi
   buffer allows); the playfield shows 145 lines of the line ahead.
 - The wagons are 50 % longer (18 rows instead of 12), so there is time for the next jump on the roofs; the chunks
   are the CPC's, stretched when they are compiled.
+- The music is new, written for the SID (same style and keys as the CPC's, longer, three voices).
 - Names of power-ups and stations are written in the HUD (the tracks' red edge columns would hide letters).
 
 ---
@@ -89,7 +92,7 @@ src/        6510 sources (main, video, world, player, pickups, hud, screens, dis
 gfx/png/    source art (indexed PNG, C64 palette) and the cover art
 levels/     track chunks (the CPC's)
 text/       screen texts, English and Greek (the CPC's)
-music/      tunes and sound effects (the CPC's)
+music/      SID instruments and tunes, sound effects (the CPC's)
 tools/      converters (graphics, chunks, texts, logo, music), the world model, screenshots, docs
 tests/      headless VICE tests
 docs/       manuals, screenshots, disk cover

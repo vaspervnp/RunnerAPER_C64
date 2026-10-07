@@ -1,0 +1,29 @@
+# SID instruments (tools/mkmusic64.py explains the fields).
+#
+# The tunes' voices: 1 the melody, 2 the bass (through the filter),
+# 3 drums and chords (the effects take it while they play).
+
+# melody: pulse with a slow sweep, vibrato on the long notes only
+lead:   ad=08 sr=a9 pw=400 pws=+20 vib=10,4,3 wave=pulse:0
+# the B section: a saw, brighter
+lead2:  ad=0a sr=a9 vib=12,4,3 wave=saw:0
+# bouzouki: a thin pulse plucked (one tick an octave up), dies away
+bzk:    ad=09 sr=00 pw=200 wave=pulse:12,pulse:0
+
+# bass: pulse through the low-pass, the filter closing on every note
+bass:   ad=06 sr=80 pw=800 pws=+30 flt=a0,-6,c wave=pulse:0
+# the menu's bass: softer, the filter closing slowly
+mbass:  ad=09 sr=a8 pw=600 pws=+18 flt=70,-1,8 wave=pulse:0
+
+# drums: absolute notes, so a transposed pattern does not change them
+kick:   ad=05 sr=00 pw=800 wave=pulse:C5,pulse:G4,pulse:C4,pulse:G3,tri:D3,tri:A2,tri:F2
+snare:  ad=06 sr=00 pw=800 wave=noise:A6,pulse:D4,noise:F6,noise:E6,noise:D6,noise:C6
+hat:    ad=02 sr=00 wave=noise:A7
+
+# chords: a fast arpeggio (one note a tick), major and minor
+arpM:   ad=05 sr=40 pw=500 pws=+30 wave=pulse:0,pulse:4,pulse:7,@0
+arpm:   ad=05 sr=40 pw=500 pws=+30 wave=pulse:0,pulse:3,pulse:7,@0
+
+# the menu: a soft flute with a slow vibrato, a plucked triangle harp
+flute:  ad=39 sr=b9 pw=500 pws=+08 vib=15,5,3 wave=pulse:0
+harp:   ad=08 sr=00 wave=tri:0

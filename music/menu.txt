@@ -1,8 +1,31 @@
-# Menu tune: calm, D minor with a hijaz turn. Original.
+# Menu tune: calm, D minor with a hijaz turn (C# and Bb over A). Written for
+# the SID.
 # tune: menu
 # quarter: 20
 # loop: yes
-A: D5/4 E5/8 F5/8 E5/4 D5/4 | C#5/4 D5/8 E5/8 A4/2 | Bb4/4 A4/8 G4/8 A4/4 Bb4/4 | C#5/4 Bb4/8 A4/8 A4/2
-A: F5/4 E5/8 D5/8 E5/4 F5/4 | G5/4 F5/8 E5/8 D5/2 | E5/8 F5/8 E5/8 D5/8 C#5/4 Bb4/4 | A4/4 C#5/4 D5/2
-B: D3/2 A2/2 | A2/2 E3/2 | G2/2 D3/2 | A2/2 E3/2
-B: D3/2 A2/2 | G2/2 D3/2 | A2/2 E3/2 | D3/2 A2/2
+#
+# Form: one bar of harp, then two 8-bar halves. Chords, bar by bar:
+#   1:  Dm A  Gm A  Dm Bb A  Dm
+#   2:  Gm Dm A  Dm Gm Dm A  A
+
+# --- melody (voice 1) ---
+pat rest1: r/1
+pat m1: @flute A4/4 D5/8 E5/8 F5/4. E5/8 | E5/4 C#5/8 D5/8 E5/2 | D5/4 G5/8 F5/8 E5/4 D5/4 | C#5/4. Bb4/8 A4/2 |
+        F5/4 A5/8 G5/8 F5/4. E5/8 | D5/4 F5/8 E5/8 D5/4 Bb4/4 | E5/8 F5/8 E5/8 D5/8 C#5/4 Bb4/8 C#5/8 | D5/2. r/4
+pat m2: @flute G5/4. A5/8 Bb5/4 A5/4 | F5/4. E5/8 D5/2 | E5/8 F5/8 G5/8 F5/8 E5/4 C#5/4 | D5/4 F5/4 A5/2 |
+        Bb5/4. A5/8 G5/4 Bb5/4 | A5/4. G5/8 F5/4 D5/4 | C#5/8 D5/8 E5/8 F5/8 E5/8 D5/8 C#5/8 Bb4/8 | A4/2. r/4
+
+# --- bass (voice 2): a bar in D (transposed: A -5, Gm -7, Bb -4) ---
+pat mb: @mbass D2/4 A2/4 D3/4 A2/4
+seq mb1: mb mb-5 mb-7 mb-5 mb mb-4 mb-5 mb
+seq mb2: mb-7 mb mb-5 mb mb-7 mb mb-5 mb-5
+
+# --- harp (voice 3): a broken chord, a bar in D ---
+pat hm: @harp D4/8 F4/8 A4/8 D5/8 A4/8 F4/8 A4/8 F4/8
+pat hM: @harp D4/8 F#4/8 A4/8 D5/8 A4/8 F#4/8 A4/8 F#4/8
+seq h1: hm hM-5 hm-7 hM-5 hm hM-4 hM-5 hm
+seq h2: hm-7 hm hM-5 hm hm-7 hm hM-5 hM-5
+
+v1: rest1 > m1 m2
+v2: mb > mb1 mb2
+v3: hm > h1 h2
