@@ -251,7 +251,7 @@ class DiskTest(FlowSteps, unittest.TestCase):
         self.addCleanup(shutil.rmtree, tmp)
         d64 = os.path.join(tmp, "runner.d64")
         shutil.copy(D64, d64)
-        disk = ["-8", d64, "+drive8truedrive", "-virtualdev8"]
+        disk = ["-drive8type", "1541", "-8", d64, "+drive8truedrive", "-virtualdev8"]
         f = Flow(image=d64, extra_args=disk)
         try:
             self.game_over_with(f, [0x99, 0x99, 0x00])     # 9999

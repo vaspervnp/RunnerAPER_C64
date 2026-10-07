@@ -18,6 +18,7 @@ KEY_LEFT, KEY_RIGHT, KEY_JUMP, KEY_DOWN = 1, 2, 4, 8
 BUF_Y = -1
 RUNNER_COLOURS = {0, 2, 6, 10}           # outline black, shirt red, jeans blue, skin light red
 
+TRAIN_WINDOW = 120                       # rows from a ramp past the end of its train (wagons: 18 rows)
 ARC_GROUND = [1] * 12
 ARC_ROOF = [3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3]
 
@@ -133,7 +134,7 @@ class MoveTest(unittest.TestCase):
 
 class RampTest(unittest.TestCase):
     def test_up_the_ramp_onto_the_roof_and_down(self):
-        rows = model_rows(700, 0)
+        rows = model_rows(1500, 0)
         ramp = next(n for n, d in enumerate(rows) if d[W.D_COLL + 1] == W.COL_RAMP_UP)  # row 0 of a ramp, lane 1
         r = Runner(speed=2)
         self.addCleanup(r.close)
@@ -144,14 +145,14 @@ class RampTest(unittest.TestCase):
             s = r.state()
             if s["feet"] >= ramp - 1 and s["z"] == s["base"]:
                 seen.setdefault(s["feet"], s["base"])
-            if s["feet"] > ramp + 60:
+            if s["feet"] > ramp + TRAIN_WINDOW:
                 break
         self.assertEqual([seen[ramp], seen[ramp + 1], seen[ramp + 2]], [0, 1, 2], "a level a ramp row")
-        on_train = [n for n in range(ramp + 3, ramp + 60)
+        on_train = [n for n in range(ramp + 3, ramp + TRAIN_WINDOW)
                     if rows[n][W.D_COLL + 1] & 15 in (W.COL_TRAIN, W.COL_GAP) and n in seen]
         self.assertTrue(on_train)
         self.assertTrue(all(seen[n] == 2 for n in on_train), "on the roof all along the train")
-        after = [n for n in range(ramp + 3, ramp + 60) if rows[n][W.D_COLL + 1] & 15 == W.COL_NONE and n in seen]
+        after = [n for n in range(ramp + 3, ramp + TRAIN_WINDOW) if rows[n][W.D_COLL + 1] & 15 == W.COL_NONE and n in seen]
         self.assertTrue(after and all(seen[n] == 0 for n in after[3:]), "back on the ground after it")
 
 

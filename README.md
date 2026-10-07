@@ -47,6 +47,8 @@ The C64 has 256 characters, colour RAM in 4×8 cells and 8 sprites, so a few thi
 - The trains and cars do not move; the signals are always red; there is no day and night cycle and no demo.
 - The playfield shows less of the line ahead (145 lines instead of 248), so the speeds are lower (1.5 / 2 / 2.5
   pixels a frame), keeping the time to react close to the CPC's.
+- The wagons are 50 % longer (18 rows instead of 12), so there is time for the next jump on the roofs; the chunks
+  are the CPC's, stretched when they are compiled.
 - Names of power-ups and stations are written in the HUD (the tracks' red edge columns would hide letters).
 
 ---

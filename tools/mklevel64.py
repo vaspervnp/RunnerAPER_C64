@@ -49,6 +49,12 @@ COIN_STEP = 2
 RAMP_ROOF_SHARE = 0.6
 BLOCK_ROWS = 12
 RAMP_KINDS = ("coins", "blocked")
+# The C64's wagons are 50 % longer than the CPC's (12 -> 18 rows): its screen
+# shows less of the line ahead, and on the roofs there must be time for the
+# next jump. Rows of a wagon's body are doubled after the chunk is checked
+# (stretch_rows); the CPC comparison builds the model with stretch=False.
+WAGON_EXTRA = 6                         # rows added to a wagon
+WAGON_STRETCH = (1, 3, 4, 6, 7, 9, 2, 5, 8, 10)     # body rows (1-10) to double, in this order
 
 
 def train_length(wagons):
@@ -220,7 +226,42 @@ def check_ramp(path, header, columns):
     return kind
 
 
-def compile_chunk(path):
+def _plain(name):
+    """a row where this lane may be doubled: rail, or the middle of a wagon or locomotive"""
+    return (name in ("rail_a", "rail_b") or "_body" in name or name.endswith("_pantograph"))
+
+
+def stretch_rows(lanes, rows):
+    """lanes: per lane [(virtual tile, collision)] bottom to top; rows: compiled
+    rows -> rows with WAGON_STRETCH body rows of every wagon doubled, where no
+    lane has anything else on that row (stops, signals, ramps, couplers, ends
+    or noses keep their size). The copy of a row carries no coin."""
+    names = [[VIRTUAL_TILES[t] for t, _ in lane] for lane in lanes]
+    count, double = len(rows), set()
+    for lane in range(3):
+        for s in range(count):
+            if not names[lane][s].endswith("_end_bottom") or s + WAGON_ROWS > count:
+                continue
+            if not names[lane][s + WAGON_ROWS - 1].endswith("_end_top"):
+                continue
+            added = 0
+            for k in WAGON_STRETCH:
+                r = s + k
+                if added < WAGON_EXTRA and all(_plain(names[other][r]) for other in range(3)):
+                    double.add(r)
+                    added += 1
+    out = []
+    for r, row in enumerate(rows):
+        out.append(row)
+        if r in double:
+            copy = list(row)
+            for lane in range(3):
+                copy[lane * 3 + 2] = 0
+            out.append(copy)
+    return out
+
+
+def compile_chunk(path, stretch=True):
     header, grid = parse(path)
     name = header.get("chunk") or os.path.splitext(os.path.basename(path))[0]
     env = header.get("env", "any")
@@ -254,13 +295,16 @@ def compile_chunk(path):
                 raise LevelError(f"{path}: line {grid[start][0]}: {length} coin(s) in lane {lane + 1} - "
                                  f"coins come in runs of {MIN_COIN_RUN} to {MAX_COIN_RUN}")
     ramp = check_ramp(path, header, columns)
+    if stretch:
+        rows = stretch_rows(lanes, rows)
     return {"name": name, "env": ENVS[env], "diff": diff, "weight": weight, "rows": rows, "ramp": ramp,
             "side_by_side": side_by_side(columns)}
 
 
-def load_all():
+def load_all(stretch=True):
+    """stretch: the C64's longer wagons; False: the CPC's chunks as they are"""
     paths = sorted(glob.glob(os.path.join(CHUNK_DIR, "*.txt")))
-    chunks = [compile_chunk(p) for p in paths]
+    chunks = [compile_chunk(p, stretch) for p in paths]
     names = [c["name"] for c in chunks]
     if len(set(names)) != len(names):
         raise LevelError("chunk names must be unique")

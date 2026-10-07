@@ -79,7 +79,9 @@ class Vice:
         # if this one exits before the monitor answers, again with another port
         for attempt in range(5):
             self.port = free_port()
-            args = [X64, "-console", "-default", "-warp", "-silent", "-sounddev", "dummy",
+            # no drive 8 unless a test attaches one: the game's LOAD of SCORES at
+            # boot then fails at once instead of waiting for an empty 1541
+            args = [X64, "-console", "-default", "-warp", "-silent", "-sounddev", "dummy", "-drive8type", "0",
                     "-binarymonitor", "-binarymonitoraddress", f"ip4://127.0.0.1:{self.port}",
                     "-autostartprgmode", "1", *os.environ.get("VICE_ARGS", "").split(), *extra_args,
                     "-autostart", image]

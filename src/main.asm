@@ -302,13 +302,16 @@ sprite_blank                    ; an empty block (player.asm: cut under decks)
         .cerror * > MENU_CHARSET, "sprites run into the menu charset"
         * = MENU_CHARSET
         .binary "data/menu_charset.bin"
+        * = MENU_CHARSET + $800         ; the rest of the VIC bank: data the VIC
+        .include "data/text.asm"        ; never reads
+        .include "data/logo.asm"
+        .include "data/music.asm"
+bank_data_end
+        .cerror bank_data_end > $8000, "data runs out of the VIC bank"
 
 ; --- data ---------------------------------------------------------------------
         * = $8000
         .include "data/chunks.asm"
         .include "data/gfx.asm"
-        .include "data/text.asm"
-        .include "data/logo.asm"
-        .include "data/music.asm"
 data_end
         .cerror data_end > WSTATE, "data runs into the generator state"

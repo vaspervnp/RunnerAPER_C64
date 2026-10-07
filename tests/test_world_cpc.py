@@ -51,6 +51,7 @@ CPCEMU = os.environ.get("CPCEMU", os.path.expanduser("~/cpcemu"))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import assets64 as A  # noqa: E402
 import worldgen as W  # noqa: E402
+import mklevel64 as L  # noqa: E402
 
 ROWS = int(os.environ.get("CPC_ROWS", "1600"))
 
@@ -110,7 +111,7 @@ class CpcWorldTest(unittest.TestCase):
                     rows[n] = list(ring[(n & 63) * 16:(n & 63) * 16 + 16])
             last = gen
         cls.cpc_rows = rows
-        model = W.World(0)
+        model = W.World(0, chunks=L.load_all(stretch=False))   # the CPC's wagons
         cls.model = {n: model.generate(n) for n in range(last + 1)}
 
     def test_same_world(self):
