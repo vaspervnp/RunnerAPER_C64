@@ -8,8 +8,8 @@ multicolor bitmap; identical cells share one character. The build fails
 when a pixel has a colour its cell cannot show (see assets64: BG/MC1/MC2 or
 the column's colour RAM) or when more than 256 characters are needed.
 Font glyphs get codes 0.. in FONT_GLYPHS order (text bytes = glyph index);
-coin characters get their own codes (their bytes are rewritten at run
-time) and are never shared.
+coin characters get their own codes, one per phase in a row (a spinning
+coin is its character changed: src/pickups.asm coin_spin), never shared.
 """
 
 import json
@@ -126,8 +126,8 @@ def convert_chars(palette=None, limit=256):
                     if spec.get("fixed"):
                         code = cs.add(data, who, share=False)
                         cs.lookup.setdefault(data, code)
-                    elif sheet == "coins":
-                        code = cs.add(data, who, share=False) if name.endswith("_0") else None
+                    elif sheet == "coins":              # every phase: consecutive codes
+                        code = cs.add(data, who, share=False)
                     else:
                         code = cs.add(data, who)
                     crow.append(code)
@@ -221,6 +221,7 @@ def write_outputs(cs, sheets, sprites):
     inc.append(f"CHARS_USED = {len(cs.chars)}")
     for coin in A.COINS:
         inc.append(f"CH_{ident(coin)} = {coin_code(sheets, coin)}")
+    inc.append(f"COIN_PHASES = {A.COIN_PHASES}")
     for i, (name, _) in enumerate(A.FONT_GLYPHS):
         inc.append(f"FONT_{ident(name)} = {i}")
     for sheet, prefix in (("track", "T"), ("side_l", "S"), ("bridges", "B")):

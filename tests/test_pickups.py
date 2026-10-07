@@ -24,6 +24,9 @@ import unittest
 from vice import EV_CHECKPOINT, EV_STOPPED, Vice
 from world_view import COIN_RAIL, COIN_ROOF
 
+COIN_PHASES = 4
+COIN_CODES = set(range(COIN_RAIL, COIN_RAIL + COIN_PHASES)) | set(range(COIN_ROOF, COIN_ROOF + COIN_PHASES))
+
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "tools"))
 import mktext64  # noqa: E402
 
@@ -167,7 +170,7 @@ class PickupTest(unittest.TestCase):
                 if d[D_FLAGS] & F_BRIDGE:
                     continue
                 for lane in range(3):
-                    shown = chars[r * 40 + LANE_X[lane] + COIN_COL] in (COIN_RAIL, COIN_ROOF)
+                    shown = chars[r * 40 + LANE_X[lane] + COIN_COL] in COIN_CODES
                     self.assertEqual(shown, d[D_ITEM + lane] == COIN,
                                      f"row {n} lane {lane}: coin shown {shown}, item {d[D_ITEM + lane]}")
         return check
@@ -196,6 +199,28 @@ class PickupTest(unittest.TestCase):
         self.assertEqual(t.coins(), 2)
         self.assertEqual(t.score(), t.distance() + 20)
         self.assertEqual(t.desc(rows[0] + 1)[D_ITEM], COIN)
+
+    def test_coins_spin(self):
+        """a few coins at a time turn (their character through its phases);
+        never more than three, and the picture keeps every coin"""
+        t = self.track()
+        start = t.ahead(3)
+        for n in range(start, start + 60, 2):
+            for lane in (0, 2):
+                t.plant(n, lane, COIN)
+        t.go()
+        check = self.coin_check(t)
+        phases, most = set(), 0
+        for _ in range(300):
+            t.frame()
+            check()
+            _, chars = t.shown()
+            turning = [c for c in chars if c in COIN_CODES and c not in (COIN_RAIL, COIN_ROOF)]
+            phases |= {(c - COIN_RAIL) % COIN_PHASES for c in turning}
+            most = max(most, len(turning))
+        self.assertEqual(phases, {1, 2, 3}, "every phase shown")
+        self.assertGreater(most, 0)
+        self.assertLessEqual(most, 3, "at most three coins turning")
 
     def test_jump_flies_over_a_coin(self):
         t = self.track()

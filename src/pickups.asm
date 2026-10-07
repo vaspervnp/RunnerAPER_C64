@@ -539,6 +539,156 @@ _char   sty lb_i
 _ret    rts
 
 ; -----------------------------------------------------------------------------
+; coin_spin: up to SPINNERS coins of the picture turn at a time: a coin's
+; character goes through its phases (png2c64: consecutive codes) and back,
+; SPIN_FRAMES frames each; then another coin, picked at random, starts.
+; Written with put_cell (the screen shown, and the hidden one if copied). A
+; coin taken, under a bridge or off the screen stops. Its own random numbers
+; (the world's are the CPC's).
+; -----------------------------------------------------------------------------
+SPINNERS        = 3
+SPIN_FRAMES     = 3
+
+coin_spin
+        lda no_pickups
+        bne _ret
+        ldx #SPINNERS-1
+_one    stx spin_i
+        lda spin_phase,x
+        bne _going
+        jsr spin_start
+        jmp _next
+_going  dec spin_wait,x
+        bne _next
+        lda #SPIN_FRAMES
+        sta spin_wait,x
+        inc spin_phase,x
+        lda spin_phase,x
+        cmp #COIN_PHASES
+        bcc +
+        lda #0                          ; round: the plain coin again
+        sta spin_phase,x
++       jsr spin_draw
+_next   ldx spin_i
+        dex
+        bpl _one
+_ret    rts
+
+; X = a spinner: a coin picked at random starts (or none this frame)
+spin_start
+        jsr spin_rnd
+        lsr a
+        lsr a
+        lsr a                           ; 0-31
+        cmp #PF_ROWS-1                  ; rows 0-19
+        bcs _ret
+        sta t8
+        jsr spin_rnd
+        rol a
+        rol a
+        rol a
+        and #3                          ; (the top bits)
+        cmp #3
+        bcs _ret
+        sta t8b
+        lda disp_top                    ; its world row
+        sec
+        sbc t8
+        sta t8c
+        lda disp_top+1
+        sbc #0
+        sta t16
+        ldy #SPINNERS-1                 ; not one already turning
+-       lda spin_phase,y
+        beq +
+        lda spin_row,y
+        cmp t8c
+        bne +
+        lda spin_lane,y
+        cmp t8b
+        beq _ret
++       dey
+        bpl -
+        lda t8c
+        sta spin_row,x
+        lda t16
+        sta spin_row_hi,x
+        lda t8b
+        sta spin_lane,x
+        lda #1
+        sta spin_phase,x
+        lda #SPIN_FRAMES
+        sta spin_wait,x
+        jmp spin_draw
+_ret    rts
+
+; X = a spinner (kept): its coin's character for its phase; no coin there
+; any more (or off the screen, or a bridge row): it stops
+spin_draw
+        lda disp_top
+        sec
+        sbc spin_row,x
+        sta t8                          ; screen row
+        lda disp_top+1
+        sbc spin_row_hi,x
+        bne _stop
+        lda t8
+        cmp #PF_ROWS-1
+        bcs _stop
+        lda spin_row,x
+        jsr desc_index
+        ldy #D_FLAGS
+        lda (dp),y
+        bmi _stop
+        lda spin_lane,x
+        clc
+        adc #D_ITEM
+        tay
+        lda (dp),y
+        cmp #ITEM_COIN
+        bne _stop
+        tya
+        sec
+        sbc #D_ITEM-D_COLL
+        tay
+        lda (dp),y
+        and #15
+        ldy #CH_COIN_RAIL
+        cmp #COL_TRAIN
+        bne +
+        ldy #CH_COIN_ROOF
++       tya
+        clc
+        adc spin_phase,x
+        pha
+        ldy spin_lane,x
+        lda lane_x,y
+        clc
+        adc #COIN_COL
+        tay
+        stx spin_x
+        ldx t8
+        pla
+        jsr put_cell
+        ldx spin_x
+        rts
+_stop   lda #0
+        sta spin_phase,x
+        rts
+
+; A = the next of the spinners' own random numbers (x * 5 + 59)
+spin_rnd
+        lda spin_seed
+        asl a
+        asl a
+        clc
+        adc spin_seed
+        clc
+        adc #59
+        sta spin_seed
+        rts
+
+; -----------------------------------------------------------------------------
 ; pickup_sprites: after player_sprites. Sprite 6 the power-up on the track,
 ; sprites 3-5 the flying coins.
 ; -----------------------------------------------------------------------------
@@ -656,6 +806,14 @@ station_seen    .word ?
 station_next    .byte ?
 no_pickups      .byte ?                 ; test switch: no items, no labels
 msg_timer       .byte ?                 ; frames the HUD message stays (hud.asm)
+spin_row        .fill SPINNERS          ; coin_spin: the coin's world row,
+spin_row_hi     .fill SPINNERS
+spin_lane       .fill SPINNERS          ; its lane,
+spin_phase      .fill SPINNERS          ; its phase (0: not turning)
+spin_wait       .fill SPINNERS          ; frames to the next phase
+spin_i          .byte ?
+spin_x          .byte ?
+spin_seed       .byte ?
 route_x         .byte ?                 ; HUD column of the runner on the route
 route_sub       .byte ?                 ; rows into that column
 hud_shown                               ; what the HUD shows ($ff: nothing yet)

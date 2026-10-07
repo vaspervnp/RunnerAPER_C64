@@ -111,7 +111,7 @@ class CpcWorldTest(unittest.TestCase):
                     rows[n] = list(ring[(n & 63) * 16:(n & 63) * 16 + 16])
             last = gen
         cls.cpc_rows = rows
-        model = W.World(0, chunks=L.load_all(stretch=False))   # the CPC's wagons
+        model = W.World(0, chunks=L.load_all(c64=False))   # the CPC's chunks
         cls.model = {n: model.generate(n) for n in range(last + 1)}
 
     def test_same_world(self):

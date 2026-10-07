@@ -131,6 +131,7 @@ _play   jsr play_input          ; countdown, pause, RUN/STOP
         jsr player_update
         jsr collide
         jsr play_pickups
+        jsr coin_spin           ; (spinning coins)
 +       lda game_mode           ; (game over: the score screen now)
         bne _done
         jsr move_flyers

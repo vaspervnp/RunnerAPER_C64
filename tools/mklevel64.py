@@ -51,9 +51,11 @@ BLOCK_ROWS = 12
 RAMP_KINDS = ("coins", "blocked")
 # The C64's wagons are 50 % longer than the CPC's (12 -> 18 rows): its screen
 # shows less of the line ahead, and on the roofs there must be time for the
-# next jump. Rows of a wagon's body are doubled after the chunk is checked
-# (stretch_rows); the CPC comparison builds the model with stretch=False.
+# next jump. Rows of a wagon's body are doubled after the chunk is checked,
+# and the coins laid out again (c64_rows); the CPC comparison builds the
+# model with c64=False.
 WAGON_EXTRA = 6                         # rows added to a wagon
+ROOF_HOLE = 4                           # roofs: every 4th coin left out (room for a power-up)
 WAGON_STRETCH = (1, 3, 4, 6, 7, 9, 2, 5, 8, 10)     # body rows (1-10) to double, in this order
 
 
@@ -231,13 +233,8 @@ def _plain(name):
     return (name in ("rail_a", "rail_b") or "_body" in name or name.endswith("_pantograph"))
 
 
-def stretch_rows(lanes, rows):
-    """lanes: per lane [(virtual tile, collision)] bottom to top; rows: compiled
-    rows -> rows with WAGON_STRETCH body rows of every wagon doubled, where no
-    lane has anything else on that row (stops, signals, ramps, couplers, ends
-    or noses keep their size). The copy of a row carries no coin."""
-    names = [[VIRTUAL_TILES[t] for t, _ in lane] for lane in lanes]
-    count, double = len(rows), set()
+def _wagon_rows_to_double(names, count):
+    double = set()
     for lane in range(3):
         for s in range(count):
             if not names[lane][s].endswith("_end_bottom") or s + WAGON_ROWS > count:
@@ -250,18 +247,87 @@ def stretch_rows(lanes, rows):
                 if added < WAGON_EXTRA and all(_plain(names[other][r]) for other in range(3)):
                     double.add(r)
                     added += 1
-    out = []
+    return double
+
+
+def c64_rows(lanes, rows):
+    """The C64's changes to a checked chunk (lanes: per lane [(virtual tile,
+    collision)] bottom to top; rows: its compiled rows):
+      - wagons 50 % longer: WAGON_STRETCH body rows of every wagon doubled,
+        where no lane has anything else on that row (stops, signals, ramps,
+        couplers, ends and noses keep their size);
+      - every run of coins spread again over the rows it now spans, a coin
+        every COIN_STEP rows (no holes where rows were doubled: coins along
+        the whole of a longer train);
+      - a train reached by a ramp: coins on all of its roof, a coin every
+        COIN_STEP rows (not on the couplers), every ROOF_HOLE-th left out:
+        the generator puts power-ups only where two rows have no coin;
+      - a run of coins gets a parallel run in a lane next to it if that lane
+        is plain rail there (and a row around), never coins in all 3 lanes."""
+    names = [[VIRTUAL_TILES[t] for t, _ in lane] for lane in lanes]
+    double = _wagon_rows_to_double(names, len(rows))
+    out, new_of = [], []
     for r, row in enumerate(rows):
-        out.append(row)
+        new_of.append(len(out))
+        out.append(list(row))
         if r in double:
             copy = list(row)
             for lane in range(3):
                 copy[lane * 3 + 2] = 0
             out.append(copy)
+
+    def tile(r, lane):
+        return VIRTUAL_TILES[out[r][lane * 3]]
+
+    def coin_ok(r, lane):
+        return out[r][lane * 3 + 1] & 15 in (COL_NONE, COL_TRAIN) and not tile(r, lane).startswith(("signal", "stop"))
+
+    for lane in range(3):
+        for start, count in coin_runs([row[lane * 3 + 2] == ITEMS["c"] for row in rows]):
+            a, b = new_of[start], new_of[start + COIN_STEP * (count - 1)]
+            for r in range(a, b + 1):
+                out[r][lane * 3 + 2] = 0
+            for r in range(a, b + 1, COIN_STEP):
+                if coin_ok(r, lane):
+                    out[r][lane * 3 + 2] = ITEMS["c"]
+
+    for lane in range(3):                       # a train with a ramp: coins on all its roof
+        if not any(tile(r, lane).startswith("ramp_up") for r in range(len(out))):
+            continue
+        r = 0
+        while r < len(out):
+            if out[r][lane * 3 + 1] & 15 not in (COL_TRAIN, COL_NOSE, COL_GAP):
+                r += 1
+                continue
+            end = r
+            while end < len(out) and out[end][lane * 3 + 1] & 15 in (COL_TRAIN, COL_NOSE, COL_GAP):
+                end += 1
+            for k in range(r, end):
+                out[k][lane * 3 + 2] = 0
+            for n, k in enumerate(range(r + 1, end - 1, COIN_STEP)):
+                if out[k][lane * 3 + 1] & 15 == COL_TRAIN and n % ROOF_HOLE != ROOF_HOLE - 1:
+                    out[k][lane * 3 + 2] = ITEMS["c"]
+            r = end
+
+    runs = []
+    for lane in range(3):
+        runs += [(lane, start, start + COIN_STEP * (count - 1))
+                 for start, count in coin_runs([row[lane * 3 + 2] == ITEMS["c"] for row in out])]
+    for i, (lane, a, b) in enumerate(sorted(runs, key=lambda run: run[1])):
+        sides = [lane + d for d in ((1, -1) if i % 2 == 0 else (-1, 1)) if 0 <= lane + d < 3]
+        for other in sides:
+            clear = all(out[r][other * 3 + 1] == COL_NONE and tile(r, other) in ("rail_a", "rail_b")
+                        and out[r][other * 3 + 2] == 0
+                        for r in range(max(0, a - 1), min(len(out), b + 2)))
+            three = any(sum(out[r][k * 3 + 2] == ITEMS["c"] for k in range(3)) >= 2 for r in range(a, b + 1))
+            if clear and not three:
+                for r in range(a, b + 1, COIN_STEP):
+                    out[r][other * 3 + 2] = ITEMS["c"]
+                break
     return out
 
 
-def compile_chunk(path, stretch=True):
+def compile_chunk(path, c64=True):
     header, grid = parse(path)
     name = header.get("chunk") or os.path.splitext(os.path.basename(path))[0]
     env = header.get("env", "any")
@@ -295,16 +361,16 @@ def compile_chunk(path, stretch=True):
                 raise LevelError(f"{path}: line {grid[start][0]}: {length} coin(s) in lane {lane + 1} - "
                                  f"coins come in runs of {MIN_COIN_RUN} to {MAX_COIN_RUN}")
     ramp = check_ramp(path, header, columns)
-    if stretch:
-        rows = stretch_rows(lanes, rows)
+    if c64:
+        rows = c64_rows(lanes, rows)
     return {"name": name, "env": ENVS[env], "diff": diff, "weight": weight, "rows": rows, "ramp": ramp,
             "side_by_side": side_by_side(columns)}
 
 
-def load_all(stretch=True):
-    """stretch: the C64's longer wagons; False: the CPC's chunks as they are"""
+def load_all(c64=True):
+    """c64: the C64's chunks (longer wagons, coins: c64_rows); False: the CPC's as they are"""
     paths = sorted(glob.glob(os.path.join(CHUNK_DIR, "*.txt")))
-    chunks = [compile_chunk(p, stretch) for p in paths]
+    chunks = [compile_chunk(p, c64) for p in paths]
     names = [c["name"] for c in chunks]
     if len(set(names)) != len(names):
         raise LevelError("chunk names must be unique")
