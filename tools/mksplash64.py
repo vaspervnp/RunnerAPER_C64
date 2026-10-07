@@ -11,7 +11,9 @@ leave the least error are kept and the other pixels go to the nearest of
 the four.
 
 Output: src/data/splash.bin = bitmap (8000) + screen matrix (1000) + colour
-RAM (1000); build/splash_preview.png (320 x 200, as the VIC-II shows it).
+RAM (1000); src/data/splash.lz = the same with the colour RAM two nibbles a
+byte (high first), packed by tools/lz64.py (the boot file unpacks it);
+build/splash_preview.png (320 x 200, as the VIC-II shows it).
 """
 
 import itertools
@@ -25,9 +27,11 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 
 import c64palette  # noqa: E402
+import lz64  # noqa: E402
 
 SRC = os.path.join(ROOT, "gfx", "splash", "revive8b.png")
 OUT = os.path.join(ROOT, "src", "data", "splash.bin")
+PACKED = os.path.join(ROOT, "src", "data", "splash.lz")
 PREVIEW = os.path.join(ROOT, "build", "splash_preview.png")
 BG = 0                                           # black
 
@@ -109,13 +113,18 @@ def main():
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "wb") as f:
         f.write(bitmap + screen + colram)
+    nibbles = bytes(colram[i] << 4 | colram[i + 1] for i in range(0, 1000, 2))
+    packed = lz64.pack_checked(bitmap + screen + nibbles)
+    with open(PACKED, "wb") as f:
+        f.write(packed)
     os.makedirs(os.path.dirname(PREVIEW), exist_ok=True)
     pix = decode(bitmap, screen, colram)
     im = Image.new("P", (160, 200))
     im.putpalette(c64palette.flat_palette())
     im.putdata([c for row in pix for c in row])
     im.resize((320, 200), Image.NEAREST).save(PREVIEW)
-    print(f"mksplash64: {over} of 32000 pixels changed colour to fit the cells ({100 * over / 32000:.1f} %)")
+    print(f"mksplash64: {over} of 32000 pixels changed colour to fit the cells ({100 * over / 32000:.1f} %), "
+          f"packed 10000 -> {len(packed)} bytes")
 
 
 if __name__ == "__main__":

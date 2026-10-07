@@ -1,14 +1,15 @@
 ; =============================================================================
 ; Runner A.P.E.R - the boot file (RUNNER on the disk, loaded first).
 ;
-; Shows the REVIVE8BIT screen (a multicolor bitmap, tools/mksplash64.py)
+; Shows the REVIVE8BIT screen (a multicolor bitmap, tools/mksplash64.py,
+; packed by tools/lz64.py: unpacked to UNPACKED, then copied in place)
 ; for 10 seconds or until SPACE (or FIRE on port 2), then loads the game
 ; (GAME_FILE) with the KERNAL, the screen still showing, and starts it.
 ;
 ; The game loads over $0801-$bfff, so the screen lives in VIC bank 3:
 ; matrix $cc00, bitmap $e000 (the RAM under the KERNAL: the KERNAL reads
-; its ROM, the VIC-II the RAM), and the loader runs from $c800. None of it
-; is in the game's file.
+; its ROM, the VIC-II the RAM), and the code runs from $c800 (copied there
+; first). None of it is in the game's file.
 ;
 ; Assembled on its own: 64tass ... -D GAME_START=$080d src/boot.asm
 ; =============================================================================
@@ -40,6 +41,8 @@ WAIT_LINE       = 251                   ; below the picture
 
 src             = $fb                   ; (free for programs)
 dst             = $fd
+mptr            = $f7                   ; (RS-232's, unused)
+UNPACKED        = $4000                 ; the picture unpacked, then copied
 count           = $fb                   ; the stub's frame counter (after the copies)
 
         * = $0801
@@ -47,10 +50,36 @@ count           = $fb                   ; the stub's frame counter (after the co
         .null $9e, format("%d", start)
 +       .word 0
 
+; only this runs at the game's addresses (tests stop at those): the rest
+; goes to STUB first
 start
         sei
-        lda #$0b                        ; screen off while the copies run
+        ldx #0
+-       .for page = 0, page < 4, page += 1
+        lda stub_code + page * $100,x
+        sta STUB + page * $100,x
+        .endfor
+        inx
+        bne -
+        jmp unpack_all
+
+; -----------------------------------------------------------------------------
+; the boot code, run at STUB
+; -----------------------------------------------------------------------------
+stub_code
+        .logical STUB
+unpack_all
+        lda #$0b                        ; screen off while it unpacks
         sta VIC_CTRL1
+        lda #<splash_lz                 ; the picture -> UNPACKED
+        sta src
+        lda #>splash_lz
+        sta src+1
+        lda #<UNPACKED
+        sta dst
+        lda #>UNPACKED
+        sta dst+1
+        jsr unpack
         ldx #0
 -       lda copies,x                    ; source, destination, length
         sta src
@@ -72,12 +101,11 @@ start
         tax
         cpx #copies_end - copies
         bne -
+        jsr colours
         jmp show
 
-copies  .word splash_data, SPLASH_BITMAP, 8000
-        .word splash_data + 8000, SPLASH_SCREEN, 1000
-        .word splash_data + 9000, COLOUR_RAM, 1000
-        .word stub_code, STUB, stub_end - show
+copies  .word UNPACKED, SPLASH_BITMAP, 8000
+        .word UNPACKED + 8000, SPLASH_SCREEN, 1000
 copies_end
 
 ; (src) -> (dst), len_hi pages and len_lo bytes
@@ -101,15 +129,117 @@ _rest   ldx len_lo
         bne -
 _done   rts
 
+; the colour RAM: two cells a byte, the high nibble first
+colours lda #<(UNPACKED + 9000)
+        sta src
+        lda #>(UNPACKED + 9000)
+        sta src+1
+        lda #<COLOUR_RAM
+        sta dst
+        lda #>COLOUR_RAM
+        sta dst+1
+        lda #<500
+        sta len_lo
+        lda #>500
+        sta len_hi
+-       ldy #0
+        lda (src),y
+        lsr a
+        lsr a
+        lsr a
+        lsr a
+        sta (dst),y
+        lda (src),y                     ; (colour RAM keeps 4 bits)
+        iny
+        sta (dst),y
+        inc src
+        bne +
+        inc src+1
++       lda dst
+        clc
+        adc #2
+        sta dst
+        bcc +
+        inc dst+1
++       lda len_lo
+        bne +
+        dec len_hi
++       dec len_lo
+        lda len_lo
+        ora len_hi
+        bne -
+        rts
+
+; tools/lz64.py's stream at (src) -> (dst): literals, near and far matches
+unpack  ldy #0
+_token  jsr _get
+        cmp #$ff
+        beq _end
+        cmp #$40
+        bcs _match
+        tax                             ; 1-64 literals
+        inx
+-       jsr _get
+        sta (dst),y
+        jsr _dst1
+        dex
+        bne -
+        beq _token
+_match  cmp #$80
+        bcs _far
+        and #$3f                        ; near: 2-65 bytes, 1-256 back
+        adc #2                          ; (C clear)
+        tax
+        jsr _get
+        sta tmp
+        clc                             ; dst - (byte + 1)
+        lda dst
+        sbc tmp
+        sta mptr
+        lda dst+1
+        sbc #0
+        sta mptr+1
+        jmp _copy
+_far    and #$7f                        ; far: 3-129 bytes, 2 bytes back
+        clc
+        adc #3
+        tax
+        jsr _get
+        sta tmp
+        jsr _get
+        sta tmp+1
+        sec
+        lda dst
+        sbc tmp
+        sta mptr
+        lda dst+1
+        sbc tmp+1
+        sta mptr+1
+_copy   lda (mptr),y
+        sta (dst),y
+        inc mptr
+        bne +
+        inc mptr+1
++       jsr _dst1
+        dex
+        bne _copy
+        beq _token
+_end    rts
+_get    lda (src),y
+        inc src
+        bne +
+        inc src+1
++       rts
+_dst1   inc dst
+        bne +
+        inc dst+1
++       rts
+
+tmp     .word 0
 len_lo  .byte 0
 len_hi  .byte 0
 copy_i  .byte 0
 
-; -----------------------------------------------------------------------------
-; the loader, run at STUB
-; -----------------------------------------------------------------------------
-stub_code
-        .logical STUB
 show
         lda #0
         sta VIC_BORDER
@@ -194,9 +324,9 @@ game_name_end
 stub_end
         .endlogical
 
-        .cerror stub_end > SPLASH_SCREEN, "the loader runs into the screen"
+        .cerror stub_end > STUB + $400, "the loader is over the 4 pages start copies"
 
-splash_data
-        .binary "data/splash.bin"
+splash_lz
+        .binary "data/splash.lz"
 boot_end
-        .cerror boot_end > $8000, "the boot file is too long"
+        .cerror boot_end > UNPACKED, "the boot file runs into the unpacked picture"

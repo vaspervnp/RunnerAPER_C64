@@ -25,7 +25,7 @@ GFX_STAMP := src/data/.stamp
 PRG     := $(BUILD)/runner.prg
 BOOT    := $(BUILD)/boot.prg
 BOOT_LABELS := $(BUILD)/boot_labels.txt
-SPLASH  := src/data/splash.bin
+SPLASH  := src/data/splash.lz
 D64     := $(BUILD)/runner.d64
 LABELS  := $(BUILD)/labels.txt
 LIST    := $(BUILD)/runner.lst
@@ -58,7 +58,7 @@ mockup: $(GFX_STAMP)
 $(PRG): $(SRC) $(GFX_STAMP) | $(BUILD)
 	$(TASS) $(TASSFLAGS) src/main.asm -o $@ --vice-labels-numeric -l $(LABELS) -L $(LIST)
 
-$(SPLASH): gfx/splash/revive8b.png tools/mksplash64.py tools/c64palette.py
+$(SPLASH): gfx/splash/revive8b.png tools/mksplash64.py tools/lz64.py tools/c64palette.py
 	$(PYTHON) tools/mksplash64.py
 
 # the boot file: the REVIVE8BIT screen, then it loads the game (the game's

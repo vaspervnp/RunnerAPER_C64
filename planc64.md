@@ -639,7 +639,7 @@ manuals, ο αλγόριθμος του `random` (ίδιο seed `#ACE1`). Τα �
       seeds): 0 χαμένα frames, γραμμή ≤ 288/312.
 
 ### Μετά την έκδοση — Οθόνη REVIVE8BIT στην εκκίνηση
-- [x] Η δισκέτα έχει δύο αρχεία: `RUNNER` (41 blocks, `src/boot.asm`) και `APER` (το παιχνίδι). Ο χρήστης φορτώνει
+- [x] Η δισκέτα έχει δύο αρχεία: `RUNNER` (31 blocks, `src/boot.asm`) και `APER` (το παιχνίδι). Ο χρήστης φορτώνει
       το `RUNNER` όπως πριν. Αυτό αντιγράφει την οθόνη στο VIC bank 3 (matrix `$CC00`, bitmap `$E000` στη RAM κάτω
       από τον KERNAL, colour RAM) και τον loader στο `$C800`, έξω από ό,τι γράφει το παιχνίδι (`$0801–$B7F7`).
       Δείχνει την οθόνη (multicolor bitmap) 500 frames (10 s) ή ώσπου SPACE / FIRE (πόρτα 2), και μετά φορτώνει το
@@ -654,6 +654,15 @@ manuals, ο αλγόριθμος του `random` (ίδιο seed `#ACE1`). Τα �
       οθόνης, 500 frames χωρίς πλήκτρο, SPACE στο frame 50 → αμέσως, το παιχνίδι στη μνήμη byte προς byte ίσο με το
       `runner.prg` με την οθόνη ακόμα εκεί, μετά το μενού. Δοκιμάστηκε και με true drive emulation του 1541.
       `vice.py`: `set_register` (το SPACE στο test γράφεται στον A μετά το `lda $dc01`).
+- [x] Η εικόνα συμπιεσμένη (`tools/lz64.py`, δικό μας LZ, byte-aligned: literals 1–64, κοντινά matches 2–65 bytes ως
+      256 πίσω με 1 byte απόσταση, μακρινά 3–129 με 2 bytes· βέλτιστο parsing με δυναμικό προγραμματισμό· η colour
+      RAM δύο κελιά ανά byte πριν): 10000 → 7151 bytes, το `RUNNER` 41 → 31 blocks. Το `unpack` (~100 bytes) την
+      ανοίγει στο `$4000` και μετά αντιγράφεται στη θέση της. Με true drive emulation η οθόνη φαίνεται ~5 s νωρίτερα
+      (ρολόι jiffy: 20 → 15 s). Το zlib θα έφτανε τα 6317 bytes (Huffman στα literals), ~1 s ακόμα: δεν άξιζε τον
+      πιο σύνθετο decompressor.
+- [x] Ο κώδικας του `RUNNER` τρέχει όλος στο `$C800` (ένας μικρός relocator στο `$080D` τον αντιγράφει εκεί): αλλιώς
+      εκτελούνταν σε διευθύνσεις του παιχνιδιού όπου τα tests βάζουν checkpoints (το `frame_done` στο `$08E9`).
+      Τα tests που ξεκινούν από το `.d64` περιμένουν πρώτα το `loaded` του `RUNNER`.
 ---
 
 ## 6. Χειρισμός

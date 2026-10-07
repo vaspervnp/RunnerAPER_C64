@@ -17,7 +17,7 @@ import sys
 import tempfile
 import unittest
 
-from vice import Vice
+from vice import BUILD, load_labels, Vice
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "tools"))
 import mktext64  # noqa: E402
@@ -37,6 +37,9 @@ class Flow:
     def __init__(self, image=None, extra_args=()):
         kw = {"image": image} if image else {}
         self.vm = Vice(play=False, extra_args=extra_args, **kw)
+        if image and image.endswith(".d64"):        # the boot file first: the game loaded
+            boot = load_labels(os.path.join(BUILD, "boot_labels.txt"))
+            self.vm.run_to(boot["loaded"], timeout=120)
         self.vm.run_frames(2)
         self.vm.poke("test_mode", 1)
         self.vm.poke("test_keys", 0)
