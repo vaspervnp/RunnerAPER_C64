@@ -39,6 +39,7 @@ from the ramps and keep away from the red signals, from the city avenue all the 
 - **Menus** with the logo, story, controls, countdown, pause, game over with name entry, **8 high scores saved to
   disk** (file `SCORES`), **English and Greek** (`L`).
 - Joystick in port 2 or keyboard.
+- A **REVIVE8BIT** boot screen (a multicolor bitmap) for 10 seconds or until SPACE, showing while the game loads.
 
 ## What is different from the CPC version
 
@@ -68,7 +69,8 @@ make docs       # docs/manual_*.pdf and the disk cover (docs/cover/)
 ```
 
 On a real C64: write `build/runner.d64` to a disk (or use an SD2IEC / Ultimate / Kung Fu Flash), then
-`LOAD"RUNNER",8` and `RUN`.
+`LOAD"RUNNER",8` and `RUN`. The disk holds two files: `RUNNER` (`src/boot.asm`: the REVIVE8BIT screen, then it
+loads the game) and `APER` (the game, `src/main.asm`).
 
 Requirements:
 
@@ -88,8 +90,8 @@ the first VIC-II, NTSC).
 ## Layout
 
 ```
-src/        6510 sources (main, video, world, player, pickups, hud, screens, disk, sound)
-gfx/png/    source art (indexed PNG, C64 palette) and the cover art
+src/        6510 sources (main, video, world, player, pickups, hud, screens, disk, sound; boot: the boot file)
+gfx/png/    source art (indexed PNG, C64 palette) and the cover art; gfx/splash/ the REVIVE8BIT screen
 levels/     track chunks (the CPC's)
 text/       screen texts, English and Greek (the CPC's)
 music/      SID instruments and tunes, sound effects (the CPC's)

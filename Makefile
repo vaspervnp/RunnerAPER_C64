@@ -23,6 +23,9 @@ GFX_TOOLS := tools/c64palette.py tools/assets64.py tools/png2c64.py tools/mkleve
 GFX_IN  += $(wildcard levels/chunks/*.txt text/*.txt music/*.txt)
 GFX_STAMP := src/data/.stamp
 PRG     := $(BUILD)/runner.prg
+BOOT    := $(BUILD)/boot.prg
+BOOT_LABELS := $(BUILD)/boot_labels.txt
+SPLASH  := src/data/splash.bin
 D64     := $(BUILD)/runner.d64
 LABELS  := $(BUILD)/labels.txt
 LIST    := $(BUILD)/runner.lst
@@ -55,9 +58,18 @@ mockup: $(GFX_STAMP)
 $(PRG): $(SRC) $(GFX_STAMP) | $(BUILD)
 	$(TASS) $(TASSFLAGS) src/main.asm -o $@ --vice-labels-numeric -l $(LABELS) -L $(LIST)
 
-$(D64): $(PRG)
+$(SPLASH): gfx/splash/revive8b.png tools/mksplash64.py tools/c64palette.py
+	$(PYTHON) tools/mksplash64.py
+
+# the boot file: the REVIVE8BIT screen, then it loads the game (the game's
+# start address from its labels)
+$(BOOT): src/boot.asm $(SPLASH) $(PRG) | $(BUILD)
+	$(TASS) $(TASSFLAGS) src/boot.asm -o $@ --vice-labels-numeric -l $(BOOT_LABELS) \
+		-D GAME_START=$$(awk '$$3 == ".start" { print "$$" $$2 }' $(LABELS))
+
+$(D64): $(PRG) $(BOOT)
 	rm -f $@
-	$(C1541) -format "runner aper,ap" d64 $@ -write $(PRG) runner >/dev/null
+	$(C1541) -format "runner aper,ap" d64 $@ -write $(BOOT) runner -write $(PRG) aper >/dev/null
 
 run: $(D64)
 	$(X64) -autostart $(D64)

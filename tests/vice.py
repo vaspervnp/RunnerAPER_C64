@@ -29,6 +29,7 @@ CMD_MEM_SET = 0x02
 CMD_CP_SET = 0x12
 CMD_CP_DELETE = 0x13
 CMD_REGS_GET = 0x31
+CMD_REGS_SET = 0x32
 CMD_BANKS = 0x82
 CMD_REGS_AVAILABLE = 0x83
 CMD_DISPLAY_GET = 0x84
@@ -245,6 +246,13 @@ class Vice:
             regs[self._regs.get(rid, rid)] = value
             pos += 1 + size
         return regs
+
+    def set_register(self, name, value):
+        """sets a CPU register ('A', 'X', 'PC', ...) while stopped"""
+        if self._regs is None:
+            self.registers()
+        rid = {v: k for k, v in self._regs.items()}[name]
+        self.command(CMD_REGS_SET, struct.pack("<BHBBH", 0, 1, 3, rid, value))
 
     # -- execution --------------------------------------------------------
     def checkpoint(self, a, op=OP_EXEC, stop=True, end=None):

@@ -14,8 +14,11 @@
 2. Insert the **RUNNER APER** disk.
 3. Type `LOAD"RUNNER",8` and press **RETURN**. When `READY.` appears, type `RUN` and press **RETURN**.
 
-The game takes about two minutes to load on a standard 1541 drive (less with a fast loader cartridge). Then the main
-menu comes up.
+First the **REVIVE8BIT** screen comes up (in about half a minute). It stays for 10 seconds, or until you press
+**SPACE** (or FIRE); then the game itself loads, with the screen still showing. On a standard 1541 drive that takes
+about two minutes more (less with a fast loader cartridge). Then the main menu comes up.
+
+![The REVIVE8BIT screen](screenshots/00_splash.png)
 
 Plug the joystick into **port 2**, or play with the keyboard.
 

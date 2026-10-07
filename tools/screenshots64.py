@@ -3,7 +3,7 @@
     python3 tools/screenshots64.py        (after make; make screenshots)
 
 Each picture is the whole frame the VIC-II drew (taken at the end of the
-split IRQ, the HUD set), with a border around the 320 x 200 screen, pixels
+split IRQ, the HUD set; the boot screen in its wait), with a border around the 320 x 200 screen, pixels
 doubled. Power-ups and coins are planted as the tests do (tests/test_pickups).
 """
 
@@ -20,20 +20,20 @@ sys.path.insert(0, os.path.join(ROOT, "tests"))
 import c64palette  # noqa: E402
 from test_pickups import COIN, D_COLL, MAGNET, TURBO, Track  # noqa: E402
 from test_screens import KEY_DOWN, KEY_FIRE, KEY_UP, Flow  # noqa: E402
-from vice import Vice  # noqa: E402
+from vice import BUILD, Vice, load_labels  # noqa: E402
 
 OUT = os.path.join(ROOT, "docs", "screenshots")
 F_FOREST = 0x01
 COL_SIGNAL = 2
 
 
-def grab(vm, name, track=None):
-    """the next whole frame -> OUT/name"""
+def grab(vm, name, track=None, sync="irq_split_end"):
+    """the next whole frame (after `sync`, twice) -> OUT/name"""
     if track:                                    # (its checkpoints stop VICE elsewhere)
         vm.delete_checkpoint(track.cp_gen)
         vm.delete_checkpoint(track.cp_frame)
-    vm.run_to("irq_split_end")
-    vm.run_to("irq_split_end")
+    vm.run_to(sync)
+    vm.run_to(sync)
     if track:
         track.cp_gen = vm.checkpoint("gen_done")
         track.cp_frame = vm.checkpoint("frame_done")
@@ -45,6 +45,19 @@ def grab(vm, name, track=None):
     im = im.resize((im.width * 2, im.height * 2), Image.NEAREST)
     im.save(os.path.join(OUT, name))
     print(f"screenshots {name}")
+
+
+def splash():
+    """the REVIVE8BIT screen of the boot file, from the .d64"""
+    d64 = os.path.join(BUILD, "runner.d64")
+    boot = load_labels(os.path.join(BUILD, "boot_labels.txt"))
+    vm = Vice(image=d64, play=False, boot_timeout=60,
+              extra_args=["-drive8type", "1541", "-8", d64, "+drive8truedrive", "-virtualdev8"])
+    try:
+        vm.run_to(boot["key_read"], timeout=120)
+        grab(vm, "00_splash.png", sync=boot["key_read"])
+    finally:
+        vm.close()
 
 
 def logo():
@@ -164,6 +177,7 @@ def power_up():
 
 def main():
     os.makedirs(OUT, exist_ok=True)
+    splash()
     screens()
     city_and_forest()
     signal()
